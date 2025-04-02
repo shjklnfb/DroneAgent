@@ -102,6 +102,8 @@ class Connection:
                 data = sock.recv(1024)
                 if data:
                     print(f"{receiver_id} 接收到消息: {data.decode()}")
+                    # 处理消息，有接受者id和消息内容
+
             except Exception as e:
                 if not self.stop_event.is_set():
                     print(f"监听错误: {e}")

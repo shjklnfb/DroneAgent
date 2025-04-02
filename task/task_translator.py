@@ -1,6 +1,6 @@
 import threading
 from queue import Queue
-
+from config.log_config import setup_logger
 from models.interface import subtask_to_python
 
 '''
@@ -18,6 +18,7 @@ class TaskTranslator:
         self.knowledge_base = {
             '基本动作': [],
         }
+        self.logger = setup_logger(self.id)
 
     def translate_subtask(self, subtasks):
         """
@@ -25,7 +26,9 @@ class TaskTranslator:
         返回格式: True/False, 代码直接写到script中该任务的文件夹（文件夹名为self.id）下,py文件名为id+subtask_id.py
         """
         # TODO: 集成大模型调用逻辑
+        self.logger.info(f"开始翻译子任务: {subtasks}")
         subtask_to_python(subtasks)
+        self.logger.info(f"完成翻译子任务: {subtasks}")
         return []
 
     def run(self):
@@ -33,7 +36,9 @@ class TaskTranslator:
         运行任务翻译器，处理所有子任务
         """
         for subtask in self.subtasks:
-            print(f"翻译子任务: {subtask}")
+            self.logger.info(f"翻译子任务: {subtask}")
             success, code = self.translate_subtask(subtask)
             if success:
-                print(f"成功翻译子任务: {subtask}")
+                self.logger.info(f"成功翻译子任务: {subtask}")
+            else:
+                self.logger.error(f"翻译子任务失败: {subtask}")

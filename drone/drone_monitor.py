@@ -18,8 +18,9 @@ import cv2  # 确保 cv2 已导入
 
 # 无人机监控器类
 class DroneMonitor(threading.Thread):
-    def __init__(self, drone_id):
+    def __init__(self, id, drone_id):
         super().__init__()
+        self.id = id  # id
         self.drone_id = drone_id
         self.data = {
             'state': None,

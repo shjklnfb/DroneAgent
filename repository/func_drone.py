@@ -234,17 +234,18 @@ def save_depth_image(dronemonitor):
             if depth_success and image_success:
                 return depth_filename, image_filename
             else:
-                return "保存深度图像或普通图像失败"
+                return "保存深度图像或普通图像失败",None
         else:
-            return "没有深度图像数据或普通图像数据无效"
+            return "没有深度图像数据或普通图像数据无效",None
     else:
-        return "监控器对象无效"
+        return "监控器对象无效",None
 
 def follow(drone, target):
     """让 {drone} 跟踪目标 {target}"""
     return True
 
-def send_message(drone, message):
+def send_message(connector, sender, receiver, message):
     """发送消息到 {drone}"""
     # 这里可以实现发送消息的逻辑
+    connector.send_message(sender,receiver,message)
     return True

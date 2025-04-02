@@ -7,8 +7,7 @@ from task.task_scheduler import TaskScheduler  # 假设 TaskScheduler 类在 tas
 from entity.entity import SubTask  # 假
 import threading
 import time
-from mywebsocket.DroneClient import DroneClient
-from mywebsocket.SchedulerServer import SchedulerServer
+
 
 class TestTaskReceptor(unittest.TestCase):
     

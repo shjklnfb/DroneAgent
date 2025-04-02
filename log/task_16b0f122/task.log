@@ -1,0 +1,6 @@
+2025-04-02 00:54:03,894 - INFO - Starting TaskScheduler
+2025-04-02 00:54:03,897 - INFO - Task 1 added to executable queue
+2025-04-02 00:54:03,897 - INFO - Starting task 1
+2025-04-02 00:54:03,897 - INFO - Initializing task 1 on device iris_0
+2025-04-02 00:54:03,913 - INFO - Sending Python code to message queue
+2025-04-02 00:54:04,187 - INFO - Python code for task task_16b0f122 sent successfully with message ID 19043a92-6191-4807-9a99-24abd559a9b8

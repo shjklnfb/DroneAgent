@@ -69,3 +69,21 @@ def subtask_to_python(subtasks):
     """
     # TODO: 调用大模型生成Python代码
     pass
+
+def perception_func(task, logs, monitor_data):
+    """
+    感知器调用，根据日志和监控数据检查任务执行情况
+    :param logs: 日志数据
+    :param monitor_data: 监控数据
+    :return: 感知结果
+    """
+    try:
+        # 调用call_with_messages方法，根据日志和监控数据检查任务执行情况
+        messages = f"当前正在执行的子任务: {task}"+f"子任务的执行日志: {logs}"+f"当前时刻的无人机监控器数据: {monitor_data}"+"请分析当前子任务的执行情况，分析子任务是否完成，是否存在错误，是否需要重新规划任务"
+        
+        result = call_with_messages(messages)
+        print(result)
+        return result
+    except Exception as e:
+        print(f"Error during perception: {e}")
+        return None

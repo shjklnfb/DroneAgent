@@ -1,6 +1,8 @@
 
 import json
 from models.llm.qwen import call_with_messages,generate_response_with_images  # 引入qwen模块
+from config.log_config import setup_logger_exec
+
 
 # 调度器的自定义库函数
 def get_drone_status(dronemonitor):
@@ -96,12 +98,16 @@ def interrupt(drone):
     """中断无人机的操作"""
     return False
 
-def log_info(information):
+def log_info(id, information):
     """记录信息日志"""
-    print(information)
+    logger = setup_logger_exec(id)
+    logger.info(information)
+    # print(information)
+    
 
-def send_to_drone(drone, command):
-    """发送命令到无人机"""
+def send_to_drone(connector, sender, receiver, message):
+    """发送消息到无人机"""
     # 这里可以实现具体的发送逻辑
-    print(f"Sending command to drone: {command}")
+    connector.send_message(sender,receiver,message)
+    print(f"Sending info to drone: {message}")
     return True
