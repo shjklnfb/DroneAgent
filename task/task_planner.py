@@ -1,23 +1,29 @@
 import yaml
-from models.interface import task_decomposition, generate_launch_file
-from config.log_config import setup_logger
+from models.model_functions import task_decomposition, generate_launch_file
+from utils.log_configurator import setup_logger
 
 '''
 任务规划器
 负责将用户输入的任务进行分解，生成子任务列表，并验证子任务之间的依赖关系。
-同时负责初始化模拟环境和云端环境。
+输入：用户任务，id
+输出：子任务列表，无人机列表
 '''
 class TaskPlanner:
     def __init__(self, id, task):
         self.id = id
         self.task = task
         self.subtasks = []
-        self.drones = []  # 将 drones 作为类的一个属性
+        self.devices = []  # 将 devices 作为类的一个属性
+        self.services = []  # 服务列表
         self.logger = setup_logger(self.id)
 
     def decompose_task(self, task):
         """
         根据prompt和task,调用deepseekr1，生成任务分解方案
+
+        在这里不仅需要分解任务，需要给出依赖，被依赖，当前无人机，无人机的ip和port
+        还需要为每个子任务分配无人机设备。
+        一旦确定了无人机设备有哪些，就可以初始化仿真环境，分配端口，为建立连接做准备
 
         输入格式: 任务描述
         返回格式: [subtask1,subtask2...,subtaskN]
@@ -50,32 +56,16 @@ class TaskPlanner:
         # TODO: 添加验证逻辑
         self.logger.info("子任务依赖关系验证完成")
 
-    def initialize_simulation(self, world_file):
+    def analyze_service(self):
         """
-        根据分解结果，初始化模拟环境。
+        分析本次任务需要的服务列表
         """
-        self.logger.info(f"初始化模拟环境，使用世界文件: {world_file}")
+        self.logger.info("开始分析服务列表")
         try:
-            content = generate_launch_file(self.drones, world_file)
-            # TODO：将content写入launch文件中
-            self.logger.info("模拟环境初始化完成")
+            self.services = ["deepseekr1", "chatgpt"]  # 示例服务列表
+            self.logger.info(f"分析完成，服务列表: {self.services}")
         except Exception as e:
-            self.logger.error(f"模拟环境初始化失败: {e}")
-            raise
-
-    def initialize_cloud(self, cloud_config):
-        """
-        初始化云端环境，配置任务所需的云端资源。
-        
-        参数:
-        cloud_config: dict 包含云端配置，例如计算资源、存储等。
-        """
-        self.logger.info(f"初始化云端环境，配置: {cloud_config}")
-        try:
-            # 模拟云端资源初始化
-            self.logger.info("云端环境初始化完成")
-        except Exception as e:
-            self.logger.error(f"云端环境初始化失败: {e}")
+            self.logger.error(f"服务分析失败: {e}")
             raise
 
     def run(self):
@@ -83,17 +73,20 @@ class TaskPlanner:
         try:
             # 进行任务分解
             subtasks = self.decompose_task(self.task)
+
             # 校验子任务依赖关系
             self.validate_dependencies(subtasks)
-            # 从subtasks列表中获取drones列表
+
+            # 从subtasks列表中获取devices列表, 列表中有型号ip和port
             for subtask in subtasks:
-                if subtask.device not in self.drones:
-                    self.drones.append(subtask.device)
-            self.logger.info(f"获取到的无人机列表: {self.drones}")
-            # 初始化模拟环境
-            self.initialize_simulation("worlds/empty.world")
-            # 初始化云端环境
-            self.initialize_cloud({"compute": "high", "storage": "large"})
+                device_info = subtask.device  # 获取 device 属性
+                if device_info not in self.devices:
+                    self.devices.append(device_info)
+            self.logger.info(f"获取到的无人机列表: {self.devices}")
+
+            # 分析服务列表
+            self.analyze_service()
+
             self.logger.info("任务规划器运行完成")
         except Exception as e:
             self.logger.error(f"任务规划器运行失败: {e}")

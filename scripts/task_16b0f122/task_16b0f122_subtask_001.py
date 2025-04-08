@@ -1,5 +1,5 @@
-from repository.func_drone import *
-from repository.func_center import *
+from repository.lib_drone import *
+from repository.lib_center import *
 
 # 子任务1：无人机1起飞到有利侦查位置，寻找到目标
 def subtask1(id, drone, dronemonitor, droneconnect):

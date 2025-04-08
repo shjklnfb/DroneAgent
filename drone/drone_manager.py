@@ -2,8 +2,8 @@ import threading
 import queue
 
 class DroneManager:
-    def __init__(self, drone_id, task, drone_executor, drone_perceptor, drone_monitor, drone_connection):
-        self.drone_id = drone_id
+    def __init__(self, device, task, drone_executor, drone_perceptor, drone_monitor, drone_connection):
+        self.device = device
         self.task = task
         self.drone_executor = drone_executor
         self.drone_perceptor = drone_perceptor

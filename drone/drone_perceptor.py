@@ -1,6 +1,6 @@
 import threading
 import time
-from models.interface import perception_func
+from models.model_functions import perception_func
 
 
 '''
@@ -10,12 +10,13 @@ from models.interface import perception_func
 '''
 
 class DronePerceptor(threading.Thread):
-    def __init__(self, id, drone_id, task, monitor):
+    def __init__(self, id, device, task, monitor, connection):
         super().__init__()
         self.id = id
-        self.drone_id = drone_id
+        self.device = device
         self.task = task
         self.monitor = monitor  # 监控器实例，用于获取无人机状态等信息
+        self.connection = connection
         self.finished = False
         self.error = False
         self.stop_event = threading.Event()
@@ -32,7 +33,7 @@ class DronePerceptor(threading.Thread):
             is_on_track = self.check_task_progress(self.task, flight_logs, monitor_data)
 
             # 定期向任务调度器汇报当前无人机的状态和信息
-            self.report_status(is_on_track, monitor_data)
+            self.report_status(is_on_track)
 
             # 每5秒检查一次
             time.sleep(5)
@@ -52,14 +53,15 @@ class DronePerceptor(threading.Thread):
         return None
     
     
-    def report_status(self, is_on_track, monitor_data):
+    def report_status(self, is_on_track):
         # 这里应该实现向任务调度器汇报状态的逻辑
         status = {
-            'drone_id': self.drone_id,
+            'device': self.device["drone"],
             'is_on_track': is_on_track,
-            'current_status': 1
         }
+
         # 模拟发送请求
+        self.connection.send(self.id, self.device["drone"], status)
         print(f"Reporting status: {status}")
 
     def stop(self):
@@ -71,4 +73,4 @@ class DronePerceptor(threading.Thread):
         # 如果任务完成，设置self.finished为True
         # 如果任务执行中出现错误，设置self.error为True
         perception_func(task, logs, monitor_data)
-        return True  
+        return "on track"  # 返回感知结果

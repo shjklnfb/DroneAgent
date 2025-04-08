@@ -1,7 +1,7 @@
 
 import json
 from models.llm.qwen import call_with_messages,generate_response_with_images  # 引入qwen模块
-from config.log_config import setup_logger_exec
+from utils.log_configurator import setup_logger_exec
 
 
 # 调度器的自定义库函数

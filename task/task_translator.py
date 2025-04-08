@@ -1,7 +1,7 @@
 import threading
 from queue import Queue
-from config.log_config import setup_logger
-from models.interface import subtask_to_python
+from utils.log_configurator import setup_logger
+from models.model_functions import subtask_to_python
 
 '''
 任务翻译器（将分解好的子任务翻译为python脚本）

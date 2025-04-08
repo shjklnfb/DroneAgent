@@ -2,22 +2,23 @@ import threading
 from drone.drone_executor import DroneExecutor
 from drone.drone_perceptor import DronePerceptor
 from drone.drone_monitor import DroneMonitor
-from drone.drone import DroneManager
-from drone.initialize import initialize_func
+from drone.drone_manager import DroneManager
+from task.task_initializer import TaskInitializer
 from queue import Queue
 from collections import defaultdict
 import os
 from kafka import KafkaProducer
 import time
-from config.log_config import setup_logger
+from utils.log_configurator import setup_logger
 from uuid import uuid4  # 添加导入
 import json
+from task.task_perceptor import TaskPerceptor  # 添加导入
 
 class TaskScheduler:
-    def __init__(self, id, subtasks, drones):
+    def __init__(self, id, subtasks, devices):
         self.id = id  
         self.subtasks = subtasks
-        self.drones = drones  # 无人机列表
+        self.devices = devices  # 无人机列表
         self.drone_monitors = {}  # 存储无人机监控器的实例
         self.drone_executors = {}  # 存储无人机执行器的实例
         self.drone_perceptors = {}  # 存储无人机感知器的实例
@@ -31,7 +32,7 @@ class TaskScheduler:
         """
         更新任务依赖关系
         """
-        self.logger.info(f"Updating dependencies for task {task_id}")
+        self.logger.info(f"更新任务 {task_id} 相关的依赖关系")
         self.dependency_status[task_id] = True
 
         for task in self.subtasks:
@@ -40,85 +41,93 @@ class TaskScheduler:
                    not self.executable_tasks.queue.count(task):
                     self.executable_tasks.put(task)
                     self.dependency_status[task.id] = True
-                    self.logger.info(f"Task {task.id} is now executable")
+                    self.logger.info(f"任务 {task.id} 现在可执行")
 
     def handle_emergency(self, emergency_info):
         """
         处理突发情况，向任务规划器汇报并要求重新规划
         """
-        self.logger.warning(f"Handling emergency: {emergency_info}")
+        self.logger.warning(f"正在处理突发: {emergency_info}")
 
-    def check_perceptors(self):
-        """
-        检查无人机感知器的状态，处理任务完成或错误的情况
-        """
-        while True:
-            for device, perceptor in list(self.drone_perceptors.items()):
-                # 如果感知器表明子任务已经完成，则停止感知器，执行器和监控器，并从字典中删除
-                if perceptor.finished:
-                    self.logger.info(f"Task {perceptor.task.id} on device {device} finished")
-                    self.drone_executors[device].stop()
-                    self.drone_monitors[device].stop()
-                    perceptor.stop()
-                    del self.drone_executors[device]
-                    del self.drone_monitors[device]
-                    del self.drone_perceptors[device]
-                    # 然后更新依赖关系
-                    self.update_dependencies(perceptor.task.id)
+    def run_centralized(self):
+        self.logger.info("集中式任务调度器启动")
 
-                # 如果感知器表明子任务执行中出现错误
-                elif perceptor.error:
-                    # TODO：添加错误处理逻辑
-                    self.logger.error(f"Error detected in task {perceptor.task.id} on device {device}")
-            time.sleep(10)
-
-    def run(self):
-        self.logger.info("Starting TaskScheduler")
         # 启动感知器检查线程
-        threading.Thread(target=self.check_perceptors, daemon=True).start()
-        # 初始化连接器
-        self.drone_connection = initialize_func(self.drones)
+        task_perceptor = TaskPerceptor()  # 创建TaskPerceptor实例
+        threading.Thread(target=task_perceptor.run, daemon=True).start()  # 启动线程
+        self.logger.info("任务感知器线程已启动")
+
+        # 初始化
+        initializer = TaskInitializer(self.id, self.devices, [])
+        self.drone_connection = initializer.initialize_connections()
+        initializer.initialize_simulation_environment("world_file_path")  # TODO: 替换为实际的世界文件路径
+        initializer.initialize_cloud_resources()  # TODO: 实现云端资源初始化
+
         # 初始化可执行任务队列
         for task in self.subtasks:
             depid = task.depid
             if not depid or all(self.dependency_status.get(dep, False) for dep in depid):
                 self.executable_tasks.put(task)
                 self.dependency_status[task.id] = True
-                self.logger.info(f"Task {task.id} added to executable queue")
+                self.logger.info(f"任务 {task.id} 已添加到可执行队列")
         
         while True:
             while not self.executable_tasks.empty():
+                # 获取可执行任务
                 task = self.executable_tasks.get()
-                self.logger.info(f"Starting task {task.id}")
+
+                # 建立连接
+
+                self.logger.info(f"开始执行任务 {task.id}")
                 # 启动无人机并发布任务到队列
                 self.task_start(task)
-                self.send_python()
+                self.send_taskscript()
+
+    def run_distributed(self):
+        self.logger.info("分布式任务调度器启动")
+
+        # 启动感知器检查线程
+        task_perceptor = TaskPerceptor()  # 创建TaskPerceptor实例
+        threading.Thread(target=task_perceptor.run, daemon=True).start()  # 启动线程
+        self.logger.info("任务感知器线程已启动")
+
+        # 初始化
+        initializer = TaskInitializer(self.id, self.devices, [])
+        self.drone_connection = initializer.initialize_connections()
+        initializer.initialize_simulation_environment("world_file_path")  # TODO: 替换为实际的世界文件路径
+        initializer.initialize_cloud_resources()  # TODO: 实现云端资源初始化
+        
+        # 一次性将所有任务推送到队列中
+        for task in self.subtasks:
+            self.logger.info(f"发送任务 {task.id} 到队列")
+            self.task_start(task)
+            self.send_taskscript()
 
     def task_start(self, task):
         """
         启动任务
         """
-        self.logger.info(f"Initializing task {task.id} on device {task.device}")
+        self.logger.info(f"初始化任务 {task.id} 在无人机 {task.device['drone']} 上")
         monitor = DroneMonitor(self.id,task.device)
-        perceptor = DronePerceptor(self.id,task.device, task, monitor)
+        perceptor = DronePerceptor(self.id,task.device, task, monitor, self.drone_connection)
         executor = DroneExecutor(self.id,task.device, task, monitor, perceptor, self.drone_connection)
         
-        self.drone_executors[task.device] = executor
-        self.drone_perceptors[task.device] = perceptor
-        self.drone_monitors[task.device] = monitor
+        self.drone_executors[task.device["drone"]] = executor
+        self.drone_perceptors[task.device["drone"]] = perceptor
+        self.drone_monitors[task.device["drone"]] = monitor
 
         drone = DroneManager(task.device, task, executor, perceptor, monitor, self.drone_connection)
         drone.start_threads()
 
-    def send_python(self):
+    def send_taskscript(self):
         """
         发送python代码到消息队列
         """
-        self.logger.info("Sending Python code to message queue")
+        self.logger.info("发送子任务代码到队列")
         task_folder = os.path.join("scripts", f"{self.id}")
         subtask_file = os.path.join(task_folder, f"{self.id}_subtask_001.py")
         if not os.path.exists(subtask_file):
-            self.logger.error(f"File not found: {subtask_file}")
+            self.logger.error(f"文件未找到: {subtask_file}")
             raise FileNotFoundError(f"File not found: {subtask_file}")
         
         with open(subtask_file, "r", encoding="utf-8") as file:
@@ -133,5 +142,5 @@ class TaskScheduler:
         producer = KafkaProducer(bootstrap_servers='47.93.46.144:9092', value_serializer=lambda v: json.dumps(v).encode('utf-8'))
         producer.send('task_queue', message)
         producer.flush()
-        self.logger.info(f"Python code for task {self.id} sent successfully with message ID {message['id']}")
+        self.logger.info(f"子任务 {self.id} 代码发送成功，消息id {message['id']}")
         return message

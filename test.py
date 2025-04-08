@@ -1,5 +1,5 @@
-from repository.func_center import *
-from repository.func_drone import *
+from repository.lib_center import *
+from repository.lib_drone import *
 import time
 from mywebsocket.SchedulerServer import SchedulerServer
 from mywebsocket.DroneClient import DroneClient

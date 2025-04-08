@@ -1,8 +1,8 @@
 import websocket
 import json
 import websockets
-from models.interface import detect_target
-from repository.func_center import get_drone_sensor_data
+from models.model_functions import detect_target
+from repository.lib_center import get_drone_sensor_data
 from repository.instructions.command_takeoff import command_takeoff
 import threading
 from repository.instructions.command_land import send_land_command

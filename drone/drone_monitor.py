@@ -18,10 +18,10 @@ import cv2  # 确保 cv2 已导入
 
 # 无人机监控器类
 class DroneMonitor(threading.Thread):
-    def __init__(self, id, drone_id):
+    def __init__(self, id, device):
         super().__init__()
         self.id = id  # id
-        self.drone_id = drone_id
+        self.device = device
         self.data = {
             'state': None,
             'position': None,
@@ -66,8 +66,8 @@ class DroneMonitor(threading.Thread):
 
     # 监控无人机
     def monitor_drone(self):
-        # rospy.init_node(f'drone_monitor_{self.drone_id}', anonymous=True)
-        prefix = f'{self.drone_id}'
+        # rospy.init_node(f'drone_monitor_{self.device["drone"]}', anonymous=True)
+        prefix = f'{self.device["drone"]}'
         
         state_sub = rospy.Subscriber(f'/{prefix}/mavros/state', State, self.state_cb)
         local_pos_sub = rospy.Subscriber(f'/{prefix}/mavros/local_position/odom', Odometry, self.local_pos_cb)
