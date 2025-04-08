@@ -54,23 +54,21 @@ class DronePerceptor(threading.Thread):
     
     
     def report_status(self, is_on_track):
-        # 这里应该实现向任务调度器汇报状态的逻辑
-        status = {
-            'device': self.device["drone"],
-            'is_on_track': is_on_track,
-        }
+        # 向任务调度器汇报状态的逻辑
+        self.connection.send_message(self.device['drone'], "scheduler", is_on_track)
 
-        # 模拟发送请求
-        self.connection.send(self.id, self.device["drone"], status)
-        print(f"Reporting status: {status}")
 
     def stop(self):
         self.stop_event.set()
 
     
     def check_task_progress(self, task, logs, monitor_data):
-        # TODO: 实现任务进度检查逻辑
-        # 如果任务完成，设置self.finished为True
-        # 如果任务执行中出现错误，设置self.error为True
-        perception_func(task, logs, monitor_data)
-        return "on track"  # 返回感知结果
+        # 提取感知结果
+        result = perception_func(task, logs, monitor_data)
+
+        # 提取分析结果,结果的格式应该是
+        if result:
+            analysis = result.output.choices[0].message.content
+            return analysis
+        return None
+

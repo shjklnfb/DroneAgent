@@ -19,7 +19,7 @@ class TestTaskReceptor(unittest.TestCase):
         description='子任务1：无人机1起飞到有利侦查位置，寻找到目标',
         depid=[],
         drone="iris_0",
-        drone_ip="127.0.0.1",
+        drone_ip="localhost",
         drone_port=8900,
         steps="无人机1起飞到有利侦查位置，寻找到目标",
         requirements={
@@ -34,7 +34,7 @@ class TestTaskReceptor(unittest.TestCase):
         description='子任务2：无人机2起飞，飞行到无人机1返回的目标位置',
         depid=[1],
         drone="iris_1",
-        drone_ip="127.0.0.1",
+        drone_ip="localhost",
         drone_port=8901,
         steps="无人机2起飞，飞行到无人机1返回的目标位置",
         requirements={

@@ -90,7 +90,7 @@ class DroneExecutor(threading.Thread):
             print("关闭 Kafka 消费者连接")
             consumer.close()
 
-    def listen(self):
+    def listen_distributed(self):
         """
         分布式执行的监听方法，持续监听消息队列，将任务消息放入任务队列。
         """
@@ -131,6 +131,6 @@ class DroneExecutor(threading.Thread):
         """
         启动分布式执行器，监听消息队列并处理任务。
         """
-        self.listen()
+        self.listen_distributed()
         pass
 

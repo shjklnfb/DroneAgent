@@ -71,7 +71,17 @@ class Connection:
 
     def _connect_sockets(self):
         """为两个套接字建立连接"""
-        self.sockets[self.id1].bind((self.ip1, self.port1))  # 绑定到指定端口
+                # 尝试绑定到指定端口，如果失败则选择一个空闲端口
+        try:
+            self.sockets[self.id1].bind((self.ip1, self.port1))  # 绑定到指定端口
+        except OSError as e:
+            if e.errno == 98:  # 端口占用错误码
+                print(f"端口 {self.port1} 被占用，尝试绑定到空闲端口...")
+                self.sockets[self.id1].bind((self.ip1, 0))  # 绑定到一个空闲端口
+                self.port1 = self.sockets[self.id1].getsockname()[1]  # 更新为实际绑定的端口
+                print(f"已绑定到新的端口: {self.port1}")
+            else:
+                raise
         self.sockets[self.id1].listen(1)
 
         # 连接到对方
@@ -115,7 +125,7 @@ class Connection:
         sock = self.sockets[receiver_id]
         while not self.stop_event.is_set():
             try:
-                data = sock.recv(1024)
+                data = sock.recv(4096)  # 扩大缓冲区大小到4096字节
                 if data:
                     # 假设消息格式为 "sender_id -> receiver_id: message"
                     decoded_message = data.decode()
@@ -123,8 +133,7 @@ class Connection:
                     # 将数据记录到以接收者命名的文件中
                     file_path = f"mywebsocket/messages/message_{receiver_id}.txt"
                     with open(file_path, "a", encoding="utf-8") as f:
-                        f.write(f"发送者: {sender_id}, 接收者: {receiver_id}, 消息: {decoded_message}\n")
-                    print(f"{receiver_id} 接收到消息: {decoded_message}")
+                        f.write(f"发送者: {sender_id}, 接收者: {receiver_id}, 消息: {decoded_message.strip()}\n")
             except Exception as e:
                 if not self.stop_event.is_set():
                     print(f"监听错误: {e}")

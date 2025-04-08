@@ -1,2 +1,18 @@
-发送者: device2, 接收者: scheduler, 消息: device2 -> scheduler: Hello from device2 to scheduler
-发送者: device1, 接收者: scheduler, 消息: device2 -> scheduler: Hello from device2 to scheduler
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"缺乏足够的监控数据和执行日志无法判断任务完成情况或是否存在错误需要更多状态信息如位置速度IMU数据等来进一步分析"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，当前处于步骤1，尚未完成起飞动作，armed状态为False，mode为OFFBOARD，位置坐标为(-1.24879,-0.603259,0.175865)，高度不足，任务仍在执行中且未超过最大重试次数"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，已进入OFFBOARD模式并执行起飞命令，但高度z=0.06274尚未达到目标高度，继续检查起飞状态。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"当前正在执行步骤2：无人机上升到有利高度，尚未完成高度检查，任务仍在进行中且无超过最大错误次数的情况"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试上升到有利高度，但因JSON解析失败导致第二次上升尝试尚未完成，任务仍在运行中，未超过最大错误次数。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第二次上升到有利高度，尚未完成最终目标，暂时未超过最大错误次数限制。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第三次执行上升命令以达到有利高度，尚未完成任务目标，暂时未超过最大错误次数限制。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第三次上升到有利高度，尚未达到目标高度，任务仍在执行中且未超过最大错误次数"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: 找到目标person,位置{'x': 0.1619616597890854, 'y': -0.046432703733444214, 'z': 11.820852279663086}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"finish","reason":""} 当前子任务为subtask2，日志显示无人机iris_0已成功完成起飞并达到有利高度，正在执行螺旋搜索目标的步骤。虽然在上升过程中多次尝试失败，但最终成功达到目标高度，满足任务完成条件。监控数据显示无人机处于OFFBOARD模式，已武装且位置、速度等信息正常，因此任务状态为完成。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务subtask1已完成 无人机成功执行了起飞、上升到有利高度和搜索目标的步骤 最终在有利高度找到了目标person 位置为{'x': 0.1619616597890854 'y': -0.046432703733444214 'z': 11.820852279663086} 整个过程中虽然上升步骤有几次失败 但都在允许的最大尝试次数内 最终步骤成功完成 任务没有错误发生。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务已成功完成，无人机iris_0完成起飞、上升到有利高度并搜索到目标person，最终满足任务目标。虽然在上升过程中多次尝试失败，但未超过最大重试次数，最终成功达到要求高度并找到目标。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":"iris_0成功完成起飞、上升到有利高度以及搜索目标的步骤，最终找到目标person，任务目标已满足"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 当前子任务subtask1已完成 无人机iris_0成功执行起飞、上升到有利高度及搜索目标的步骤 最终找到目标"person" 位置信息已记录 整个过程中虽然存在几次上升失败但未超过最大尝试次数 不影响最终任务完成状态
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务subtask1已完成，无人机iris_0成功执行起飞、上升到有利高度以及搜索目标的步骤。尽管在上升过程中多次尝试失败，原因包括JSON解析失败、缺乏视觉线索和关键信息不足，但最终成功达到有利高度并找到目标person。所有步骤均在允许的最大尝试次数内完成，符合任务完成条件。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: 找到目标person,位置{'x': -2.250091075897217, 'y': -3.040248394012451, 'z': 10.418554306030273}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"finish","reason":""} 任务subtask2已完成，无人机iris_0和iris_1均成功执行起飞、上升到有利高度及搜索目标的步骤。尽管过程中iris_1多次上升失败（如JSON解析失败、缺乏视觉线索等原因），但最终在允许的重试次数内完成上升并找到目标。所有关键步骤均在限定尝试次数内成功执行，满足任务完成条件。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 当前子任务subtask1已完成 无人机iris_0成功起飞并达到有利高度且找到目标person 无错误发生 步骤均在允许的重试次数内完成 最终目标满足 整个过程符合预期无需额外调整

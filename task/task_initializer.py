@@ -46,9 +46,6 @@ class TaskInitializer:
 
         return comm
     
-    @staticmethod
-    def establish_connection(device, scheduler_id, scheduler_ip, scheduler_port):
-        print("新无人机建立连接")
 
     def initialize_simulation_environment(self, world_file):
         """

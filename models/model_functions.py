@@ -79,10 +79,13 @@ def perception_func(task, logs, monitor_data):
     """
     try:
         # 调用call_with_messages方法，根据日志和监控数据检查任务执行情况
-        messages = f"当前正在执行的子任务: {task}"+f"子任务的执行日志: {logs}"+f"当前时刻的无人机监控器数据: {monitor_data}"+"请分析当前子任务的执行情况，分析子任务是否完成，是否存在错误，是否需要重新规划任务"
+        messages = f"当前正在执行的子任务: {task}"+f"子任务的执行日志: {logs}"+f"当前时刻的无人机监控器数据: {monitor_data}"
+        messages += "请分析当前子任务的执行情况，分析子任务是否完成，是否存在错误。注意只有当任务的最终目标得到满足时，才认为任务完成。"
+        messages += "每个步骤执行都可以重复一定的次数，因此暂时的错误不算错误，只有错误超过一定次数才算错误。运行中表示任务的步骤错误还没有超过最大次数，最后一个步骤也没有执行完成。"
+        messages += "任意一个步骤出错超过限度时，任务就会失败。失败时给出失败的原因和在哪个步骤失败的。"
+        messages += "要求的输出的内容格式为：{\"task\":\"task.name\",\"state\":\"finish/error/running\",\"reason\":\"reason\"}。字数在200字以内，不要换行。注意这个task.name是subtask1,subtask2等子任务的名称,而不是步骤的名称或描述。"
         
         result = call_with_messages(messages)
-        print(result)
         return result
     except Exception as e:
         print(f"Error during perception: {e}")

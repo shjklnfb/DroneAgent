@@ -53,7 +53,7 @@ class TaskScheduler:
         self.logger.info("集中式任务调度器启动")
 
         # 启动感知器检查线程
-        task_perceptor = TaskPerceptor()  # 创建TaskPerceptor实例
+        task_perceptor = TaskPerceptor(self)  # 创建TaskPerceptor实例
         threading.Thread(target=task_perceptor.run, daemon=True).start()  # 启动线程
         self.logger.info("任务感知器线程已启动")
 
@@ -68,7 +68,7 @@ class TaskScheduler:
             depid = task.depid
             if not depid or all(self.dependency_status.get(dep, False) for dep in depid):
                 self.executable_tasks.put(task)
-                self.dependency_status[task.id] = True
+                # self.dependency_status[task.id] = True  任务结束时标记
                 self.logger.info(f"任务 {task.id} 已添加到可执行队列")
         
         while True:
@@ -76,12 +76,31 @@ class TaskScheduler:
                 # 获取可执行任务
                 task = self.executable_tasks.get()
 
-                # 建立连接
+                # 建立当前任务无人机与其他无人机之间的连接
+                threading.Thread(target=self.establish_drone_connections, args=(task,), daemon=True).start()
 
+                
                 self.logger.info(f"开始执行任务 {task.id}")
                 # 启动无人机并发布任务到队列
                 self.task_start(task)
                 self.send_taskscript()
+
+    
+    def establish_drone_connections(self, task):
+        """
+        建立当前任务无人机与其他无人机之间的连接
+        """
+        for device in self.devices:
+            if device["drone"] != task.device["drone"]:
+                self.logger.info(f"建立无人机 {task.device['drone']} 与无人机 {device['drone']} 的连接")
+                connection = self.drone_connection.connect(
+                    (task.device["drone"], task.device["drone_ip"], task.device["drone_port"]),
+                    (device["drone"], device["drone_ip"], device["drone_port"])
+                )
+                if connection:
+                    self.logger.info(f"无人机 {task.device['drone']} 成功连接到无人机 {device['drone']}")
+                else:
+                    self.logger.warning(f"无人机 {task.device['drone']} 无法连接到无人机 {device['drone']}")
 
     def run_distributed(self):
         self.logger.info("分布式任务调度器启动")

@@ -12,7 +12,7 @@ def test_communication():
     # 建立连接
     comm.connect(device1, device2)
     comm.connect(device2, device3)
-    comm.connect(device1, device3)
+    comm.connect(device2, device1)
 
     # 等待连接建立完成
     time.sleep(1)
