@@ -2,7 +2,7 @@ from repository.lib_drone import *
 from repository.lib_center import *
 
 # 子任务1：无人机1起飞到有利侦查位置，寻找到目标
-def subtask1(id, drone, dronemonitor, droneconnect):
+def subtask1(id, drone, dronemonitor, droneconnect, dynamic_data):
     """子任务1：无人机1起飞到有利侦查位置，寻找到目标"""
     # Step1: 无人机1起飞
     log_info(id, "下面执行步骤1：无人机起飞")
@@ -23,7 +23,7 @@ def subtask1(id, drone, dronemonitor, droneconnect):
         else:
             log_info(id, f"无人机{drone}起飞失败，原因：{reason}")
     else:
-        log_info(id, f"{drone} 起飞失败超过5次")
+        log_info(id, f"{drone} 起飞失败超过5次,任务终止")
         return False
 
     # Step2: 无人机1上升到有利高度
@@ -41,7 +41,7 @@ def subtask1(id, drone, dronemonitor, droneconnect):
         status = get_drone_position(dronemonitor)
         log_info(id, f"正在检查无人机{drone} 是否达到有利高度")
         result,reason = check_with_picture(drone, status, "观察图像，当无人机的高度没有障碍物时，可以认为处于了一个比较合适的观察高度，达到目标", [photo_file])
-        if i == 5:
+        if i == 8:
             result = True
         if result:
             log_info(id, f"{drone} 成功达到有利高度")
@@ -49,7 +49,7 @@ def subtask1(id, drone, dronemonitor, droneconnect):
         else:
             log_info(id, f"无人机{drone} 上升失败，原因：{reason}")
     else:
-        log_info(id, f"{drone} 上升失败超过10次")
+        log_info(id, f"{drone} 上升失败超过10次,任务终止")
         return True
 
     # Step3: 无人机1搜索目标
@@ -63,10 +63,15 @@ def subtask1(id, drone, dronemonitor, droneconnect):
         result, pos = spiral(drone, dronemonitor, "person", 5, 1, 15)
         if result:
             log_info(id, f"找到目标person，位置：{pos}")
-            droneconnect.send_message("iris_0", "scheduler", f"找到目标person,位置{pos}")
-            return True
+            droneconnect.send_message("iris_0", "iris_1", f"任务{{subtask1}}提供数据: {{\"target_position\": {pos}}}")
+            land(drone)
+            droneconnect.send_message("iris_0", "iris_1", f"任务{{subtask1}}执行成功，在无人机{{iris_1}}开始执行任务{{subtask2}}，请准备")
+            return True    
         else:
             log_info(id, f"{drone} 未找到目标，扩大搜索范围")
+    else:    
+        log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")
+        return False
+
         
-    log_info(id, f"{drone} 搜索目标失败超过5次")
-    return False
+    

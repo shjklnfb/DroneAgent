@@ -3,6 +3,7 @@ from models.model_functions import task_decomposition, generate_launch_file
 from utils.log_configurator import setup_logger
 from threading import Thread
 from models.model_libirary import ModelLibrary
+from multiprocessing import Manager
 
 class TaskInitializer:
     """
@@ -32,13 +33,9 @@ class TaskInitializer:
     def initialize_connections(self):
         """
         初始化无人机连接，仅建立调度器和无人机之间的连接。
-        该方法会启动一个线程，不断尝试建立连接。
-        连接建立后，会将连接信息存储在 Communication 实例中。
-
-        返回:
-            Communication: Communication 实例，管理所有连接。
         """
-        comm = Communication()
+        manager = Manager()
+        comm = Communication(manager=manager)  # 使用共享的 Manager
 
         # 启动线程不断尝试建立连接
         connection_thread = Thread(target=self.connection_worker, args=(comm,))

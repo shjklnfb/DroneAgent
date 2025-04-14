@@ -20,7 +20,7 @@ class ModelLibrary:
                 "description": "Qwen large language model service",
                 "apikey": "sk-d34cba22d2a04a5c8c191f082106d07e"
             },
-            "deepseek": {
+            "deepseek-r1": {
                 "domain": "deepseek.example.com",
                 "port": 443,
                 "description": "Deepseek task decomposition model service",

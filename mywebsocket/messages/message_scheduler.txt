@@ -1,18 +1,36 @@
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"缺乏足够的监控数据和执行日志无法判断任务完成情况或是否存在错误需要更多状态信息如位置速度IMU数据等来进一步分析"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，当前处于步骤1，尚未完成起飞动作，armed状态为False，mode为OFFBOARD，位置坐标为(-1.24879,-0.603259,0.175865)，高度不足，任务仍在执行中且未超过最大重试次数"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，已进入OFFBOARD模式并执行起飞命令，但高度z=0.06274尚未达到目标高度，继续检查起飞状态。"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"当前正在执行步骤2：无人机上升到有利高度，尚未完成高度检查，任务仍在进行中且无超过最大错误次数的情况"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试上升到有利高度，但因JSON解析失败导致第二次上升尝试尚未完成，任务仍在运行中，未超过最大错误次数。"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第二次上升到有利高度，尚未完成最终目标，暂时未超过最大错误次数限制。"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第三次执行上升命令以达到有利高度，尚未完成任务目标，暂时未超过最大错误次数限制。"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机iris_0正在尝试第三次上升到有利高度，尚未达到目标高度，任务仍在执行中且未超过最大错误次数"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: 找到目标person,位置{'x': 0.1619616597890854, 'y': -0.046432703733444214, 'z': 11.820852279663086}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"finish","reason":""} 当前子任务为subtask2，日志显示无人机iris_0已成功完成起飞并达到有利高度，正在执行螺旋搜索目标的步骤。虽然在上升过程中多次尝试失败，但最终成功达到目标高度，满足任务完成条件。监控数据显示无人机处于OFFBOARD模式，已武装且位置、速度等信息正常，因此任务状态为完成。
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务subtask1已完成 无人机成功执行了起飞、上升到有利高度和搜索目标的步骤 最终在有利高度找到了目标person 位置为{'x': 0.1619616597890854 'y': -0.046432703733444214 'z': 11.820852279663086} 整个过程中虽然上升步骤有几次失败 但都在允许的最大尝试次数内 最终步骤成功完成 任务没有错误发生。
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务已成功完成，无人机iris_0完成起飞、上升到有利高度并搜索到目标person，最终满足任务目标。虽然在上升过程中多次尝试失败，但未超过最大重试次数，最终成功达到要求高度并找到目标。
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":"iris_0成功完成起飞、上升到有利高度以及搜索目标的步骤，最终找到目标person，任务目标已满足"}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 当前子任务subtask1已完成 无人机iris_0成功执行起飞、上升到有利高度及搜索目标的步骤 最终找到目标"person" 位置信息已记录 整个过程中虽然存在几次上升失败但未超过最大尝试次数 不影响最终任务完成状态
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 任务subtask1已完成，无人机iris_0成功执行起飞、上升到有利高度以及搜索目标的步骤。尽管在上升过程中多次尝试失败，原因包括JSON解析失败、缺乏视觉线索和关键信息不足，但最终成功达到有利高度并找到目标person。所有步骤均在允许的最大尝试次数内完成，符合任务完成条件。
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: 找到目标person,位置{'x': -2.250091075897217, 'y': -3.040248394012451, 'z': 10.418554306030273}
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"finish","reason":""} 任务subtask2已完成，无人机iris_0和iris_1均成功执行起飞、上升到有利高度及搜索目标的步骤。尽管过程中iris_1多次上升失败（如JSON解析失败、缺乏视觉线索等原因），但最终在允许的重试次数内完成上升并找到目标。所有关键步骤均在限定尝试次数内成功执行，满足任务完成条件。
-发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"finish","reason":""} 当前子任务subtask1已完成 无人机iris_0成功起飞并达到有利高度且找到目标person 无错误发生 步骤均在允许的重试次数内完成 最终目标满足 整个过程符合预期无需额外调整
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask1","state":"running","reason":"当前子任务为None监控数据均为空无法判断任务完成情况无任何步骤执行日志显示正在运行中没有出现超过最大重试次数的错误"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"当前子任务尚未开始执行监控数据为空无法判断任务状态和目标完成情况"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，当前为第1次尝试，尚未满足起飞条件，任务仍在执行中。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，当前处于第1次尝试，尚未完成起飞动作，armed状态为False，mode为OFFBOARD，位置和速度数据正常，未超过最大尝试次数，任务仍在执行中。"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask1","state":"running","reason":"无人机正在尝试起飞，已发送起飞命令，但尚未检测到起飞成功，当前高度为0.0288米，模式为AUTO.LOITER，未超过最大尝试次数，任务仍在执行中。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"running","reason":"无人机正在尝试上升到有利高度当前高度为0.033m未达到目标高度"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask2","state":"running","reason":"无人机正在尝试上升到有利高度，当前为第二次尝试，尚未达到目标高度，任务仍在执行中。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask2","state":"running","reason":"无人机iris_0正在尝试上升到有利高度，但因拍摄图像为纯蓝色背景，无法判断高度，目前正在进行第三次尝试，尚未超过最大尝试次数，任务仍在执行中。"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索尝试寻找目标当前为第一次尝试尚未完成任务"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索以寻找目标当前未完成且无错误超过限制"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索尝试寻找目标当前未完成但无错误"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索以寻找目标，尚未完成搜索任务，且无错误超过限度的情况。"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标，尚未找到目标并扩大了搜索范围，但未超过最大尝试次数，任务仍在进行中"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标，已尝试2次未找到目标，扩大搜索范围后继续执行搜索任务，暂未超过最大尝试次数，任务仍在运行中"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标，尚未找到目标并扩大搜索范围，但未超过最大尝试次数，任务仍在进行中。"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索以寻找目标当前未找到目标但仍在尝试范围内未超过最大重试次数"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 任务当前处于子任务3（搜索目标）阶段，日志显示无人机iris_0在第二次螺旋搜索中成功找到目标"person"，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}。子任务3已完成，未发现错误，任务状态为完成。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 当前子任务为搜索目标（subtask3），无人机已成功找到目标person，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}，满足任务完成条件。前序子任务包括起飞和上升至有利高度均已成功完成，无错误记录。
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":"无人机在螺旋搜索过程中成功找到目标person，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}，任务目标满足"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"finish","reason":"iris_0成功找到目标person并返回其位置信息任务完成"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索目标的步骤尝试第2次尚未完成搜索且未超过最大重试次数目前未发现错误"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 任务subtask3（无人机搜索目标）已完成 无人机iris_0成功在位置{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}找到目标person前两个步骤中无人机起飞和上升到有利高度均成功执行当前无人机状态为guided模式且位置信息正常无错误发生任务继续推进中
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":"iris_0成功找到目标person并确定其位置在{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 当前子任务为搜索目标（subtask3），日志显示无人机iris_0在第二次螺旋搜索中成功找到目标"person"，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}。任务未出现超过最大重试次数的错误，最终目标已满足，因此子任务完成。
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":"iris_0成功找到目标person位于{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}完成搜索目标任务"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标第二次尝试尚未完成未超过最大尝试次数"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标第二次尚未完成未超过最大尝试次数"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 无人机在执行子任务3（搜索目标）过程中，经过两次尝试成功找到了目标"person"，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}，满足任务要求，子任务完成。前序子任务中，无人机起飞与上升至有利高度也均已成功，当前状态正常，无错误发生。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"无人机正在执行螺旋搜索寻找目标第二次尝试未找到目标已扩大搜索范围但尚未完成搜索任务"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"running","reason":"正在执行螺旋搜索寻找目标第二次尚未完成任务未发现目标超过最大次数或达到最终目标"}
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 任务子任务3（无人机搜索目标）已完成 无人机成功执行了螺旋搜索并在第二次尝试中找到了目标"person"位于指定坐标 未超过最大错误次数且最终目标已满足 当前状态显示任务成功无错误
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 任务subtask3（无人机搜索目标）已完成 无人机iris_0在螺旋搜索过程中成功找到目标"person"位于{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156} 之前虽然有未找到目标的情况但通过扩大搜索范围最终完成目标搜索 任务执行过程中无超过最大尝试次数的错误 故任务状态为完成
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"running","reason":"正在执行螺旋搜索寻找目标第二次尝试未找到目标已扩大搜索范围当前无人机状态为AUTO.LAND但仍在尝试搜索"}
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 当前子任务为搜索目标（subtask3），日志显示无人机iris_0在第二次螺旋搜索中成功找到目标"person"，位置信息已记录。任务步骤未出现超过最大重试次数的失败情况，最终目标已满足，因此子任务完成。
+发送者: iris_1, 接收者: scheduler, 消息: iris_1 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 当前子任务为搜索目标（subtask3），日志显示无人机iris_0在螺旋搜索过程中成功找到目标"person"，位置已明确。任务未报告超过最大重试次数的失败情况，最终目标已满足，因此子任务完成。
+发送者: iris_0, 接收者: scheduler, 消息: iris_0 -> scheduler: {"task":"subtask3","state":"finish","reason":""} 当前子任务为搜索目标，日志显示无人机已找到目标"person"，位置为{'x': -5.854642835556348, 'y': -8.72818088789408, 'z': 12.013099670410156}，满足任务要求。起飞和上升步骤虽有重试，但最终成功，不影响整体任务完成状态。监控数据显示无人机正进入自动降落模式，任务已完成。

@@ -249,3 +249,4 @@ def send_message(connector, sender, receiver, message):
     # 这里可以实现发送消息的逻辑
     connector.send_message(sender,receiver,message)
     return True
+
