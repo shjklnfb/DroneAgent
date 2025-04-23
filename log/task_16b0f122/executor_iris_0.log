@@ -1,0 +1,221 @@
+2025-04-22 01:23:27,862 - INFO - 无人机感知器开始运行，无人机ID: iris_0
+2025-04-22 01:23:27,879 - INFO - 无人机 iris_0 的P2P节点已启动，端口: 8900
+2025-04-22 01:23:27,879 - INFO - 已启动连接维护器任务
+2025-04-22 01:23:27,879 - INFO - 连接维护器启动，将持续尝试连接到调度器和其他无人机...
+2025-04-22 01:23:27,879 - INFO - 尝试连接到调度器 - 第 1/3 次尝试
+2025-04-22 01:23:27,913 - INFO - 成功连接到调度器
+2025-04-22 01:23:27,913 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:23:27,913 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:23:27,914 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:29,917 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:23:29,917 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:30,444 - INFO - 已向调度器发送任务的状态报告
+2025-04-22 01:23:31,920 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:23:31,921 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:32,733 - INFO - 收到来自 scheduler 的消息
+2025-04-22 01:23:32,733 - INFO - 接收到消息: {'sender_id': 'scheduler', 'message': {'msg_type': 'script', 'msg_len': 3211, 'msg_content': 'from repository.lib_drone import *\nfrom repository.lib_center import *\nimport asyncio\nimport json\n\n# 子任务1：无人机1起飞到有利侦查位置，寻找到目标\ndef subtask1(id, drone, dronemonitor, p2p_node, dynamic_data):\n    """子任务1：无人机1起飞到有利侦查位置，寻找到目标"""\n    # Step1: 无人机1起飞\n    log_info(id, "下面执行步骤1：无人机起飞")\n    for i in range(5):\n        log_info(id, f"无人机起飞尝试第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号")\n            return False\n        log_info(id, f"{drone} 执行起飞命令")\n        takeoff(drone)\n        time.sleep(10)  # 假设起飞需要5秒\n        status = get_drone_status(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否起飞成功")\n        result,reason = check(drone, status, "无人机是否已经起飞")\n        if result:\n            log_info(id, f"{drone} 起飞成功")\n            break\n        else:\n            log_info(id, f"无人机{drone}起飞失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 起飞失败超过5次,任务终止")\n        return False\n\n    # Step2: 无人机1上升到有利高度\n    log_info(id, "下面执行步骤2：无人机上升到有利高度")\n    for i in range(10):\n        log_info(id, f"无人机尝试上升第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止上升")\n            return False\n        log_info(id, f"{drone} 执行上升命令")\n        move_ascend(drone, 2, 1)  # 假设以2m/s的速度上升1秒\n        photo = take_photo(dronemonitor)\n        log_info(id, f"{drone} 拍摄图像用于高度检查")\n        photo_file = photo\n        status = get_drone_position(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否达到有利高度")\n        result,reason = check_with_picture(drone, status, "观察图像，当无人机的高度没有障碍物时，可以认为处于了一个比较合适的观察高度，达到目标", [photo_file])\n        if i == 8:\n            result = True\n        if result:\n            log_info(id, f"{drone} 成功达到有利高度")\n            break\n        else:\n            log_info(id, f"无人机{drone} 上升失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 上升失败超过10次,任务终止")\n        return False\n\n    # Step3: 无人机1搜索目标\n    log_info(id, "下面执行步骤3：无人机搜索目标")\n    for i in range(5):\n        log_info(id, f"无人机尝试搜索目标第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止搜索")\n            return False\n        log_info(id, f"{drone} 执行螺旋搜索")\n        result, pos = spiral(drone, dronemonitor, "person", 5, 1, 15)\n        if result:\n            log_info(id, f"找到目标person，位置：{pos}")\n            \n            # 使用p2p_node发送数据消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "data",\n                "msg_content": json.dumps({"target_position": [6,6,6]})\n            })\n            log_info(id, f"已发送目标位置数据到无人机iris_1")\n            \n            land(drone)\n            \n            # 使用p2p_node发送通知启动消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "start_notice",\n                "msg_content": json.dumps({\n                    "completed_task": "subtask1",\n                    "next_task": "subtask2",\n                    "status": "success"\n                })\n            })\n            log_info(id, f"已发送任务完成通知到无人机iris_1")\n            \n            return True    \n        else:\n            log_info(id, f"{drone} 未找到目标，扩大搜索范围")\n    else:    \n        log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")\n        return False\n\n\n\n\n\n'}, 'timestamp': 1745310212.7336462}
+2025-04-22 01:23:32,734 - INFO - 已将消息转发到DronePerceptor进行处理
+2025-04-22 01:23:35,457 - INFO - 接收到脚本消息: from repository.lib_drone import *
+from repository.lib_center import *
+import asyncio
+import json
+
+# 子任务1：无人机1起飞到有利侦查位置，寻找到目标
+def subtask1(id, drone, dronemonitor, p2p_node, dynamic_data):
+    """子任务1：无人机1起飞到有利侦查位置，寻找到目标"""
+    # Step1: 无人机1起飞
+    log_info(id, "下面执行步骤1：无人机起飞")
+    for i in range(5):
+        log_info(id, f"无人机起飞尝试第{i+1}次")
+        if interrupt(drone):
+            log_info(id, f"{drone} 受到中断信号")
+            return False
+        log_info(id, f"{drone} 执行起飞命令")
+        takeoff(drone)
+        time.sleep(10)  # 假设起飞需要5秒
+        status = get_drone_status(dronemonitor)
+        log_info(id, f"正在检查无人机{drone} 是否起飞成功")
+        result,reason = check(drone, status, "无人机是否已经起飞")
+        if result:
+            log_info(id, f"{drone} 起飞成功")
+            break
+        else:
+            log_info(id, f"无人机{drone}起飞失败，原因：{reason}")
+    else:
+        log_info(id, f"{drone} 起飞失败超过5次,任务终止")
+        return False
+
+    # Step2: 无人机1上升到有利高度
+    log_info(id, "下面执行步骤2：无人机上升到有利高度")
+    for i in range(10):
+        log_info(id, f"无人机尝试上升第{i+1}次")
+        if interrupt(drone):
+            log_info(id, f"{drone} 受到中断信号，停止上升")
+            return False
+        log_info(id, f"{drone} 执行上升命令")
+        move_ascend(drone, 2, 1)  # 假设以2m/s的速度上升1秒
+        photo = take_photo(dronemonitor)
+        log_info(id, f"{drone} 拍摄图像用于高度检查")
+        photo_file = photo
+        status = get_drone_position(dronemonitor)
+        log_info(id, f"正在检查无人机{drone} 是否达到有利高度")
+        result,reason = check_with_picture(drone, status, "观察图像，当无人机的高度没有障碍物时，可以认为处于了一个比较合适的观察高度，达到目标", [photo_file])
+        if i == 8:
+            result = True
+        if result:
+            log_info(id, f"{drone} 成功达到有利高度")
+            break
+        else:
+            log_info(id, f"无人机{drone} 上升失败，原因：{reason}")
+    else:
+        log_info(id, f"{drone} 上升失败超过10次,任务终止")
+        return False
+
+    # Step3: 无人机1搜索目标
+    log_info(id, "下面执行步骤3：无人机搜索目标")
+    for i in range(5):
+        log_info(id, f"无人机尝试搜索目标第{i+1}次")
+        if interrupt(drone):
+            log_info(id, f"{drone} 受到中断信号，停止搜索")
+            return False
+        log_info(id, f"{drone} 执行螺旋搜索")
+        result, pos = spiral(drone, dronemonitor, "person", 5, 1, 15)
+        if result:
+            log_info(id, f"找到目标person，位置：{pos}")
+            
+            # 使用p2p_node发送数据消息
+            send_p2p_message(p2p_node, "iris_0", {
+                "msg_len":1,
+                "msg_type": "data",
+                "msg_content": json.dumps({"target_position": [6,6,6]})
+            })
+            log_info(id, f"已发送目标位置数据到无人机iris_1")
+            
+            land(drone)
+            
+            # 使用p2p_node发送通知启动消息
+            send_p2p_message(p2p_node, "iris_0", {
+                "msg_len":1,
+                "msg_type": "start_notice",
+                "msg_content": json.dumps({
+                    "completed_task": "subtask1",
+                    "next_task": "subtask2",
+                    "status": "success"
+                })
+            })
+            log_info(id, f"已发送任务完成通知到无人机iris_1")
+            
+            return True    
+        else:
+            log_info(id, f"{drone} 未找到目标，扩大搜索范围")
+    else:    
+        log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")
+        return False
+
+
+
+
+
+
+2025-04-22 01:23:36,928 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:23:36,928 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:23:36,932 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:38,934 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:23:38,935 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:40,941 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:23:40,943 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:45,955 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:23:45,956 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:23:45,961 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:47,962 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:23:47,962 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:49,964 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:23:49,965 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:54,972 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:23:54,972 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:23:54,973 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:56,974 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:23:56,975 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:23:58,977 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:23:58,978 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:03,988 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:03,988 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:03,989 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:05,995 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:05,996 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:07,997 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:07,998 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:13,003 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:13,004 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:13,004 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:15,007 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:15,007 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:17,009 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:17,015 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:22,019 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:22,020 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:22,021 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:24,031 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:24,034 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:26,037 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:26,038 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:31,042 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:31,042 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:31,043 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:33,045 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:33,052 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:35,056 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:35,058 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:40,079 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:40,079 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:40,081 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:42,084 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:42,084 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:44,088 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:44,089 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:49,089 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:49,090 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:49,091 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:51,129 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:24:51,134 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:53,142 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:24:53,146 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:24:58,152 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:24:58,152 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:24:58,154 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:00,156 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:25:00,156 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:02,158 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:25:02,159 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:07,166 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:25:07,166 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:25:07,170 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:09,173 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:25:09,174 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:11,176 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:25:11,177 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:15,089 - INFO - 已向调度器发送任务的状态报告
+2025-04-22 01:25:16,180 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:25:16,180 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:25:16,181 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:18,185 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:25:18,190 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:20,191 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:25:20,196 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:22,262 - INFO - 已向调度器发送任务的状态报告
+2025-04-22 01:25:25,200 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:25:25,200 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:25:25,200 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:27,202 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:25:27,202 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:29,205 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:25:29,206 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:29,322 - INFO - 已向调度器发送任务的状态报告
+2025-04-22 01:25:34,211 - INFO - 存在 1 个未连接的其他无人机，尝试连接...
+2025-04-22 01:25:34,211 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 1/3 次尝试
+2025-04-22 01:25:34,212 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:36,214 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 2/3 次尝试
+2025-04-22 01:25:36,215 - WARNING - 连接到无人机 iris_1 失败
+2025-04-22 01:25:38,088 - INFO - 已向调度器发送任务的状态报告
+2025-04-22 01:25:38,215 - INFO - 尝试连接到无人机 iris_1(localhost:8901) - 第 3/3 次尝试
+2025-04-22 01:25:38,216 - WARNING - 连接到无人机 iris_1 失败

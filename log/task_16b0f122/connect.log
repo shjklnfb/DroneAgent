@@ -1,94 +1,109 @@
-2025-04-13 23:21:19,242 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:21:19,254 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:21:57,495 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:21:57,495 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:21:57,536 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:22:50,449 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:22:50,449 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:22:50,492 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:24:04,898 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:24:04,914 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:24:04,924 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:24:42,029 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:24:42,033 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:24:42,046 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:25:37,162 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-13 23:27:37,081 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:27:37,081 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:27:37,176 - INFO - 已记录连接元数据: iris_1 <-> iris_0
-2025-04-13 23:27:37,411 - INFO - 连接已存在: iris_0 <-> iris_1
-2025-04-13 23:27:37,743 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-13 23:30:32,118 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:30:32,121 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:30:32,190 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:33:00,753 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:33:00,756 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:33:00,765 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:34:20,945 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-13 23:47:08,892 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:47:08,892 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:47:08,974 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-13 23:48:44,028 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-13 23:51:06,672 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:51:06,693 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:51:06,696 - INFO - 已记录连接元数据: iris_1 <-> iris_0
-2025-04-13 23:51:07,139 - INFO - 连接已存在: iris_0 <-> iris_1
-2025-04-13 23:51:07,639 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-13 23:55:10,297 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-13 23:55:10,331 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-13 23:55:10,336 - INFO - 已记录连接元数据: iris_1 <-> iris_0
-2025-04-13 23:55:10,672 - INFO - 连接已存在: iris_0 <-> iris_1
-2025-04-13 23:55:10,969 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 00:00:16,560 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:00:16,591 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:00:16,622 - INFO - 已记录连接元数据: iris_1 <-> iris_0
-2025-04-14 00:00:17,129 - INFO - 连接已存在: iris_0 <-> iris_1
-2025-04-14 00:00:17,762 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 00:01:30,611 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:01:30,611 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:01:30,665 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:03:27,559 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:03:27,567 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:03:27,568 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:04:18,126 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:04:18,154 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:04:18,156 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:06:56,666 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:06:56,673 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:06:56,686 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:07:31,134 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:07:31,135 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:07:31,145 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:08:46,247 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 00:24:20,011 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:24:20,022 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:24:20,084 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:27:03,760 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:27:03,797 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:27:03,808 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:29:55,917 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:29:55,919 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:29:55,981 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:30:41,036 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 00:46:51,556 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 00:46:51,563 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 00:46:51,578 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 00:48:31,693 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 02:14:57,410 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 02:14:57,410 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 02:14:57,570 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 02:17:35,738 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 02:17:35,738 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 02:17:35,747 - INFO - 已记录连接元数据: iris_0 <-> iris_1
-2025-04-14 02:18:20,836 - INFO - 连接已存在: iris_1 <-> iris_0
-2025-04-14 04:37:12,667 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 04:37:12,686 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 04:38:04,725 - WARNING - 连接元数据不存在: iris_0 <-> iris_1
-2025-04-14 05:15:07,929 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 05:15:07,973 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 05:16:04,708 - WARNING - 连接元数据不存在: iris_0 <-> iris_1
-2025-04-14 05:16:07,672 - WARNING - 连接元数据不存在: iris_0 <-> iris_1
-2025-04-14 05:19:49,677 - INFO - 已记录连接元数据: iris_0 <-> scheduler
-2025-04-14 05:19:49,679 - INFO - 已记录连接元数据: iris_1 <-> scheduler
-2025-04-14 05:20:53,870 - WARNING - 连接元数据不存在: iris_0 <-> iris_1
-2025-04-14 05:20:55,855 - WARNING - 连接元数据不存在: iris_0 <-> iris_1
+2025-04-22 01:23:27,680 - INFO - 节点 scheduler 服务器启动在 localhost:9000
+2025-04-22 01:23:27,708 - ERROR - 连接到节点 iris_0 失败: [Errno 111] Connect call failed ('127.0.0.1', 8900)
+2025-04-22 01:23:27,879 - INFO - 节点 iris_0 服务器启动在 localhost:8900
+2025-04-22 01:23:27,913 - INFO - 接受来自节点 iris_0 的连接
+2025-04-22 01:23:27,913 - INFO - 已连接到节点 scheduler
+2025-04-22 01:23:27,914 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:29,726 - INFO - 已经连接到节点 iris_0
+2025-04-22 01:23:29,727 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:29,917 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:30,444 - INFO - 向节点 scheduler 发送消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"当前无执行日志且无人机监控器数据为空无法判断任务完成情况位置精度、状态检查间隔等要求尚未满足中断处理功能未触发任务仍在运行中"}'}
+2025-04-22 01:23:30,444 - INFO - 从节点 iris_0 收到消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"当前无执行日志且无人机监控器数据为空无法判断任务完成情况位置精度、状态检查间隔等要求尚未满足中断处理功能未触发任务仍在运行中"}'}
+2025-04-22 01:23:31,730 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:31,921 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:32,733 - INFO - 向节点 iris_0 发送消息: {'msg_type': 'script', 'msg_len': 3211, 'msg_content': 'from repository.lib_drone import *\nfrom repository.lib_center import *\nimport asyncio\nimport json\n\n# 子任务1：无人机1起飞到有利侦查位置，寻找到目标\ndef subtask1(id, drone, dronemonitor, p2p_node, dynamic_data):\n    """子任务1：无人机1起飞到有利侦查位置，寻找到目标"""\n    # Step1: 无人机1起飞\n    log_info(id, "下面执行步骤1：无人机起飞")\n    for i in range(5):\n        log_info(id, f"无人机起飞尝试第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号")\n            return False\n        log_info(id, f"{drone} 执行起飞命令")\n        takeoff(drone)\n        time.sleep(10)  # 假设起飞需要5秒\n        status = get_drone_status(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否起飞成功")\n        result,reason = check(drone, status, "无人机是否已经起飞")\n        if result:\n            log_info(id, f"{drone} 起飞成功")\n            break\n        else:\n            log_info(id, f"无人机{drone}起飞失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 起飞失败超过5次,任务终止")\n        return False\n\n    # Step2: 无人机1上升到有利高度\n    log_info(id, "下面执行步骤2：无人机上升到有利高度")\n    for i in range(10):\n        log_info(id, f"无人机尝试上升第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止上升")\n            return False\n        log_info(id, f"{drone} 执行上升命令")\n        move_ascend(drone, 2, 1)  # 假设以2m/s的速度上升1秒\n        photo = take_photo(dronemonitor)\n        log_info(id, f"{drone} 拍摄图像用于高度检查")\n        photo_file = photo\n        status = get_drone_position(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否达到有利高度")\n        result,reason = check_with_picture(drone, status, "观察图像，当无人机的高度没有障碍物时，可以认为处于了一个比较合适的观察高度，达到目标", [photo_file])\n        if i == 8:\n            result = True\n        if result:\n            log_info(id, f"{drone} 成功达到有利高度")\n            break\n        else:\n            log_info(id, f"无人机{drone} 上升失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 上升失败超过10次,任务终止")\n        return False\n\n    # Step3: 无人机1搜索目标\n    log_info(id, "下面执行步骤3：无人机搜索目标")\n    for i in range(5):\n        log_info(id, f"无人机尝试搜索目标第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止搜索")\n            return False\n        log_info(id, f"{drone} 执行螺旋搜索")\n        result, pos = spiral(drone, dronemonitor, "person", 5, 1, 15)\n        if result:\n            log_info(id, f"找到目标person，位置：{pos}")\n            \n            # 使用p2p_node发送数据消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "data",\n                "msg_content": json.dumps({"target_position": [6,6,6]})\n            })\n            log_info(id, f"已发送目标位置数据到无人机iris_1")\n            \n            land(drone)\n            \n            # 使用p2p_node发送通知启动消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "start_notice",\n                "msg_content": json.dumps({\n                    "completed_task": "subtask1",\n                    "next_task": "subtask2",\n                    "status": "success"\n                })\n            })\n            log_info(id, f"已发送任务完成通知到无人机iris_1")\n            \n            return True    \n        else:\n            log_info(id, f"{drone} 未找到目标，扩大搜索范围")\n    else:    \n        log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")\n        return False\n\n\n\n\n\n'}
+2025-04-22 01:23:32,733 - INFO - 从节点 scheduler 收到消息: {'msg_type': 'script', 'msg_len': 3211, 'msg_content': 'from repository.lib_drone import *\nfrom repository.lib_center import *\nimport asyncio\nimport json\n\n# 子任务1：无人机1起飞到有利侦查位置，寻找到目标\ndef subtask1(id, drone, dronemonitor, p2p_node, dynamic_data):\n    """子任务1：无人机1起飞到有利侦查位置，寻找到目标"""\n    # Step1: 无人机1起飞\n    log_info(id, "下面执行步骤1：无人机起飞")\n    for i in range(5):\n        log_info(id, f"无人机起飞尝试第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号")\n            return False\n        log_info(id, f"{drone} 执行起飞命令")\n        takeoff(drone)\n        time.sleep(10)  # 假设起飞需要5秒\n        status = get_drone_status(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否起飞成功")\n        result,reason = check(drone, status, "无人机是否已经起飞")\n        if result:\n            log_info(id, f"{drone} 起飞成功")\n            break\n        else:\n            log_info(id, f"无人机{drone}起飞失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 起飞失败超过5次,任务终止")\n        return False\n\n    # Step2: 无人机1上升到有利高度\n    log_info(id, "下面执行步骤2：无人机上升到有利高度")\n    for i in range(10):\n        log_info(id, f"无人机尝试上升第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止上升")\n            return False\n        log_info(id, f"{drone} 执行上升命令")\n        move_ascend(drone, 2, 1)  # 假设以2m/s的速度上升1秒\n        photo = take_photo(dronemonitor)\n        log_info(id, f"{drone} 拍摄图像用于高度检查")\n        photo_file = photo\n        status = get_drone_position(dronemonitor)\n        log_info(id, f"正在检查无人机{drone} 是否达到有利高度")\n        result,reason = check_with_picture(drone, status, "观察图像，当无人机的高度没有障碍物时，可以认为处于了一个比较合适的观察高度，达到目标", [photo_file])\n        if i == 8:\n            result = True\n        if result:\n            log_info(id, f"{drone} 成功达到有利高度")\n            break\n        else:\n            log_info(id, f"无人机{drone} 上升失败，原因：{reason}")\n    else:\n        log_info(id, f"{drone} 上升失败超过10次,任务终止")\n        return False\n\n    # Step3: 无人机1搜索目标\n    log_info(id, "下面执行步骤3：无人机搜索目标")\n    for i in range(5):\n        log_info(id, f"无人机尝试搜索目标第{i+1}次")\n        if interrupt(drone):\n            log_info(id, f"{drone} 受到中断信号，停止搜索")\n            return False\n        log_info(id, f"{drone} 执行螺旋搜索")\n        result, pos = spiral(drone, dronemonitor, "person", 5, 1, 15)\n        if result:\n            log_info(id, f"找到目标person，位置：{pos}")\n            \n            # 使用p2p_node发送数据消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "data",\n                "msg_content": json.dumps({"target_position": [6,6,6]})\n            })\n            log_info(id, f"已发送目标位置数据到无人机iris_1")\n            \n            land(drone)\n            \n            # 使用p2p_node发送通知启动消息\n            send_p2p_message(p2p_node, "iris_0", {\n                "msg_len":1,\n                "msg_type": "start_notice",\n                "msg_content": json.dumps({\n                    "completed_task": "subtask1",\n                    "next_task": "subtask2",\n                    "status": "success"\n                })\n            })\n            log_info(id, f"已发送任务完成通知到无人机iris_1")\n            \n            return True    \n        else:\n            log_info(id, f"{drone} 未找到目标，扩大搜索范围")\n    else:    \n        log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")\n        return False\n\n\n\n\n\n'}
+2025-04-22 01:23:33,739 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:36,932 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:38,750 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:38,935 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:40,803 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:40,943 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:42,816 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:45,958 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:47,829 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:47,962 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:49,842 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:49,965 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:51,860 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:54,973 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:56,897 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:56,975 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:58,912 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:23:58,978 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:00,930 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:03,989 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:05,963 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:05,996 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:07,987 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:07,998 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:09,998 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:13,004 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:15,007 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:15,044 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:17,013 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:17,054 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:19,085 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:22,020 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:24,034 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:24,097 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:26,037 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:26,120 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:28,139 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:31,043 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:33,052 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:33,154 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:35,058 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:35,162 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:37,172 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:40,081 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:42,084 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:42,186 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:44,089 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:44,196 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:46,213 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:49,091 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:51,133 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:51,224 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:53,146 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:53,247 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:55,257 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:24:58,154 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:00,156 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:00,275 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:02,159 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:02,282 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:04,297 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:07,169 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:09,174 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:09,308 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:11,177 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:11,317 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:13,324 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:15,085 - INFO - 向节点 scheduler 发送消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式，正前往有利侦查位置，但尚未到达目标位置，任务仍在执行中，未发现错误或超出允许失败次数的情况。"}'}
+2025-04-22 01:25:15,094 - INFO - 从节点 iris_0 收到消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式，正前往有利侦查位置，但尚未到达目标位置，任务仍在执行中，未发现错误或超出允许失败次数的情况。"}'}
+2025-04-22 01:25:16,181 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:18,187 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:18,332 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:20,193 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:20,341 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:22,258 - INFO - 向节点 scheduler 发送消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式正在向有利侦查位置移动当前速度和位置正常尚未找到目标"}'}
+2025-04-22 01:25:22,265 - INFO - 从节点 iris_0 收到消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式正在向有利侦查位置移动当前速度和位置正常尚未找到目标"}'}
+2025-04-22 01:25:22,362 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:25,200 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:27,202 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:27,380 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:29,206 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:29,322 - INFO - 向节点 scheduler 发送消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式位置精度需达到0.5米当前高度为17.89米仍在寻找目标过程中未发现错误或超过最大重试次数的情况"}'}
+2025-04-22 01:25:29,329 - INFO - 从节点 iris_0 收到消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机已起飞并处于OFFBOARD模式位置精度需达到0.5米当前高度为17.89米仍在寻找目标过程中未发现错误或超过最大重试次数的情况"}'}
+2025-04-22 01:25:29,396 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:31,405 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:34,212 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:36,215 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:36,419 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:38,087 - INFO - 向节点 scheduler 发送消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机正处于AUTO.LAND模式，位置坐标为(-5.277, -1.486, 15.097)，尚未到达有利侦查位置或寻找到目标，任务仍在执行中且未超出最大错误次数"}'}
+2025-04-22 01:25:38,099 - INFO - 从节点 iris_0 收到消息: {'msg_type': 'task_progress', 'msg_content': '{"task":"subtask1","state":"running","reason":"无人机正处于AUTO.LAND模式，位置坐标为(-5.277, -1.486, 15.097)，尚未到达有利侦查位置或寻找到目标，任务仍在执行中且未超出最大错误次数"}'}
+2025-04-22 01:25:38,216 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:38,434 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:40,448 - ERROR - 连接到节点 iris_1 失败: [Errno 111] Connect call failed ('127.0.0.1', 8901)
+2025-04-22 01:25:41,322 - INFO - 与节点 iris_0 的连接已关闭

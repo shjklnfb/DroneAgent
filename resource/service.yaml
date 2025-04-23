@@ -1,0 +1,50 @@
+# 本文件保存软件服务的配置信息
+# 格式 名称: 类型: 地址: ip: 端口: 描述: apikey:    
+
+yolov8:
+  type:
+  url:
+  ip: "47.93.46.144"
+  port: 8000
+  description: "YOLO object detection service"
+  apikey: 
+
+qwen-vl-plus:
+  type:
+  url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  ip:
+  port: 443
+  description: "Large language model service"
+  apikey: "sk-d34cba22d2a04a5c8c191f082106d07e"
+
+qwen-plus:
+  type:
+  url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  ip:
+  port: 443
+  description: "Qwen large language model service"
+  apikey: "sk-d34cba22d2a04a5c8c191f082106d07e"
+
+deepseek-r1:
+  type:
+  url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  ip:
+  port: 443
+  description: "Deepseek task decomposition model service"
+  apikey: "sk-d34cba22d2a04a5c8c191f082106d07e"
+
+服务1:
+  type:
+  url: "https://baidu.com"
+  ip:
+  port: 443
+  description: "baidu1"
+  apikey: "111"
+
+服务2:
+  type:
+  url: "https://baidu.com"
+  ip:
+  port: 443
+  description: "baidu2"
+  apikey: "111"

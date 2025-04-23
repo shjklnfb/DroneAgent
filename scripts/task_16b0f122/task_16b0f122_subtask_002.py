@@ -2,7 +2,7 @@ from repository.lib_drone import *
 from repository.lib_center import *
 
 # 子任务1：无人机2起飞到有利侦查位置，寻找到目标
-def subtask2(id, drone, dronemonitor, droneconnect, dynamic_data):
+def subtask2(id, drone, dronemonitor, p2p_node, dynamic_data):
     """子任务1：无人机2起飞到有利侦查位置，寻找到目标"""
     # Step1: 无人机2起飞
     log_info(id, "下面执行步骤1：无人机起飞")
@@ -13,7 +13,7 @@ def subtask2(id, drone, dronemonitor, droneconnect, dynamic_data):
             return False
         log_info(id, f"{drone} 执行起飞命令")
         takeoff(drone)
-        time.sleep(15)  # 假设起飞需要5秒
+        time.sleep(10)  # 假设起飞需要5秒
         status = get_drone_status(dronemonitor)
         log_info(id, f"正在检查无人机{drone} 是否起飞成功")
         result,reason = check(drone, status, "无人机是否已经起飞")
@@ -43,13 +43,11 @@ def subtask2(id, drone, dronemonitor, droneconnect, dynamic_data):
         result,reason = check(drone, status, "无人机是否已经到达目标点")
         if result:
             log_info(id, f"{drone} 到达目标点成功")
-            break
+            return True
         else:
             log_info(id, f"无人机{drone}飞行失败，原因：{reason}")
     else:
         log_info(id, f"{drone} 飞行失败超过5次,任务终止")
         return False
 
-        
-    log_info(id, f"{drone} 搜索目标失败超过5次,任务终止")
-    return False
+    

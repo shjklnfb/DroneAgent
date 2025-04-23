@@ -26,7 +26,7 @@ class TestTaskReceptor(unittest.TestCase):
         'interrupt_handling': True,
         'status_check_interval': 3,
         'position_accuracy': 0.5
-        }
+        },services=["服务1"]
     )
         subtask2_instance = SubTask(
         id=2,
@@ -41,12 +41,12 @@ class TestTaskReceptor(unittest.TestCase):
         'interrupt_handling': True,
         'status_check_interval': 3,
         'position_accuracy': 0.5
-        }
+        },services=["服务2"]
     )
         subtasks = [subtask1_instance, subtask2_instance]
         scheduler = TaskScheduler("task_16b0f122",subtasks,[{"drone":"iris_0","drone_ip":"localhost","drone_port":8900},{"drone":"iris_1","drone_ip":"localhost","drone_port":8901}])
-        # scheduler.run_centralized()
-        scheduler.run_distributed()
+        scheduler.run_centralized()
+        # scheduler.run_distributed()
 
 
 

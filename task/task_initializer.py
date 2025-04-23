@@ -1,9 +1,10 @@
-from mywebsocket.connect import Communication
-from models.model_functions import task_decomposition, generate_launch_file
-from utils.log_configurator import setup_logger
+from models.model_functions import func_task_decomposition, func_generate_launch_file
+from utils.log_configurator import setup_task_logger
 from threading import Thread
 from models.model_libirary import ModelLibrary
 from multiprocessing import Manager
+import os
+import time
 
 class TaskInitializer:
     """
@@ -16,33 +17,22 @@ class TaskInitializer:
         self.id = id
         self.devices = devices # 无人机列表，包含型号、ip、port信息,ip和port是已经分配好的
         self.services = services  # 服务列表
-        self.logger = setup_logger(self.id)
+        self.logger = setup_task_logger(self.id)
         self.model_library = ModelLibrary()  # 模型库实例
 
-    def connection_worker(self,comm):
-        while True:
-            for device in self.devices:
-                # 每台无人机与调度器连接
-                scheduler_id, scheduler_ip, scheduler_port = "scheduler", "localhost", 9000
-                drone = device['drone']
-                drone_ip = device['drone_ip']
-                drone_port = device['drone_port']
-                if not comm.connections.get((drone, scheduler_id)) and not comm.connections.get((scheduler_id, drone)):
-                    comm.connect((drone, drone_ip, drone_port), (scheduler_id, scheduler_ip, scheduler_port))
-
-    def initialize_connections(self):
-        """
-        初始化无人机连接，仅建立调度器和无人机之间的连接。
-        """
-        manager = Manager()
-        comm = Communication(manager=manager)  # 使用共享的 Manager
-
-        # 启动线程不断尝试建立连接
-        connection_thread = Thread(target=self.connection_worker, args=(comm,))
-        connection_thread.start()
-
-        return comm
-    
+    # async def initialize_connections(self):
+    #     """
+    #     初始化 WebSocket 客户端连接。
+    #     """
+    #     try:
+    #         self.logger.info("尝试连接到调度器服务器...")
+    #         scheduler = WebSocketClient("ws://localhost:6789", "Scheduler")
+    #         await scheduler.connect()  # 客户端注册到服务器
+    #         self.logger.info("调度器成功连接到服务器")
+    #         return scheduler
+    #     except Exception as e:
+    #         self.logger.error(f"调度器连接到服务器失败: {e}")
+    #         raise
 
     def initialize_simulation_environment(self, world_file):
         """
@@ -52,7 +42,7 @@ class TaskInitializer:
         try:
             # 更新设备信息的引用
             devices_info = [{"drone": device['drone'], "ip": device['drone_ip'], "port": device['drone_port']} for device in self.devices]
-            content = generate_launch_file(devices_info, world_file)
+            content = func_generate_launch_file(devices_info, world_file)
             # TODO：将content写入launch文件中
             self.logger.info("模拟环境初始化完成")
         except Exception as e:
@@ -80,15 +70,46 @@ class TaskInitializer:
         except Exception as e:
             self.logger.error(f"云端环境初始化失败: {e}")
             raise
+    
+    def record_service_info(self):
+        """
+        根据服务列表记录服务信息到文件。
+        """
+
+        self.logger.info("记录服务信息到文件")
+        try:
+            # 创建目标文件夹
+            folder_path = os.path.join("scripts", self.id)
+            os.makedirs(folder_path, exist_ok=True)
+
+            # 文件路径
+            file_path = os.path.join(folder_path, "task_info.txt")
+
+            # 记录服务信息
+            with open(file_path, "a", encoding="utf-8") as file:
+                file.write("services:\n")
+                for service_name in self.services:
+                    service_info = self.model_library.get_service_info(service_name)
+                    if service_info is None:
+                        raise ValueError(f"找不到服务 {service_name}")
+                    file.write(f"- service_name: {service_name}\n")
+                    file.write(f"  service_type: {service_info.get('type', 'N/A')}\n")
+                    file.write(f"  service_description: {service_info.get('description', 'N/A')}\n")
+                    file.write(f"  service_ip: {service_info.get('ip', 'N/A')}\n")
+                    file.write(f"  service_url: {service_info.get('url', 'N/A')}\n")
+                    file.write(f"  service_port: {service_info.get('port', 'N/A')}\n")
+                    file.write(f"  service_apikey: {service_info.get('apikey', 'N/A')}\n")
+
+            self.logger.info(f"服务信息已记录到 {file_path}")
+        except Exception as e:
+            self.logger.error(f"记录服务信息失败: {e}")
+            raise
 
     def run(self):
         """
         运行任务初始化器，执行所有初始化步骤。
         """
         self.logger.info("任务初始化器开始运行")
-        
-        # 初始化无人机连接
-        comm = self.initialize_connections()
 
         # 初始化模拟环境
         world_file = "path/to/world/file"
@@ -96,3 +117,6 @@ class TaskInitializer:
 
         # 初始化云端资源
         self.initialize_cloud_resources()
+
+        self.record_service_info()
+        self.logger.info("任务初始化器运行完成")

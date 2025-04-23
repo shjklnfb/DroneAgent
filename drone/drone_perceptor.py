@@ -1,7 +1,11 @@
 import threading
 import time
-from models.model_functions import perception_func
-
+from utils.log_configurator import setup_drone_logger
+from queue import Queue
+from models.model_functions import func_task_perception
+import json
+import os
+import asyncio
 
 '''
 无人机感知器
@@ -10,32 +14,90 @@ from models.model_functions import perception_func
 '''
 
 class DronePerceptor(threading.Thread):
-    def __init__(self, id, device, task, monitor, connection):
+    def __init__(self, id, device, task, monitor, executor=None):
         super().__init__()
         self.id = id
         self.device = device
         self.task = task
         self.monitor = monitor  # 监控器实例，用于获取无人机状态等信息
-        self.connection = connection  # 共享的连接实例
+        self.executor = executor  # 执行器实例，用于执行脚本
         self.dynamic_data = {} # 动态数据，可能是无人机的状态、位置等信息
-        self.finished = False
-        self.error = False
         self.stop_event = threading.Event()
-        self.dis_finished_list = []  # 分布式任务完成列表
+        self.message_queue = []  # 用于存储接收到的消息
+        self.dis_finished_list = []  # 分布式执行中完成的任务ID列表
+        
+        self.logger = setup_drone_logger(id, device["drone"])
+
+    # 异步函数每收到消息，就会调用一次这个方法
+    # 如何处理呢：将消息放入一个队列中，定期分析这个队列中的消息
+    def process_message(self, yaw_message):
+        """
+        处理接收到的消息
+        
+        Args:
+            message: {
+                        "sender_id": sender_id,
+                        "message": message_content,
+                        "timestamp": timestamp
+                    }
+        """
+        """
+        scheduler收到的消息有哪些可能呢？消息的格式应该如何定义？
+        message的格式要求：        
+        {
+            msg_type:"",
+            msg_len:"",
+            msg_content:"",
+        }
+        1. 发送脚本的消息：
+        类型是"script"，内容就是脚本代码
+        2. 通知任务进度的消息
+        类型是"task_progress"，内容是
+        3. 启动通知的消息
+        类型是"start_notice"，内容是
+        4. 错误消息
+        类型是"error"，内容
+        5. 传递数据的消息
+        类型是"data"，内容是
+        """
+        self.logger.info(f"接收到消息: {yaw_message}")
+
+        # 将消息记录到队列中，维护最新的50条消息
+        if not hasattr(self, "message_queue"):
+            self.message_queue = []
+
+        if len(self.message_queue) >= 50:
+            self.message_queue.pop(0)  # 删除队头元素
+
+        self.message_queue.append(yaw_message)
+
+        # 将消息记录到日志文件中
+        try:
+            log_dir = os.path.join("log", str(self.id))
+            if not os.path.exists(log_dir):
+                os.makedirs(log_dir)
+            
+            log_file_path = os.path.join(log_dir, f"message_{self.device['drone']}.log")
+            with open(log_file_path, 'a', encoding='utf-8') as log_file:
+                log_file.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - {json.dumps(yaw_message, ensure_ascii=False)}\n")
+        except Exception as e:
+            self.logger.error(f"写入消息日志文件失败: {str(e)}")
 
     def run(self):
+        self.logger.info(f"无人机感知器开始运行，无人机ID: {self.device['drone']}")
         while not self.stop_event.is_set():
-            self.analysis_messages()  # 分析无人机之间的消息，更新任务之间的依赖关系，并传递必要的数据
+            self.percept_message()  # 分析无人机之间的消息，更新任务之间的依赖关系，并传递必要的数据
+
             # 读取飞行日志
             flight_logs = self.read_flight_logs()
             # 读取无人机监控器的数据
             monitor_data = self.monitor.data
-            
             # 检查无人机是否正在正确执行子任务或接近子任务的目标
             is_on_track = self.check_task_progress(self.task, flight_logs, monitor_data)
 
             # 定期向任务调度器汇报当前无人机的状态和信息
-            self.report_status(is_on_track)
+            if is_on_track is not None:
+                self.report_status(is_on_track)
 
             # 每5秒检查一次
             time.sleep(5)
@@ -56,9 +118,45 @@ class DronePerceptor(threading.Thread):
     
     
     def report_status(self, is_on_track):
-        # 向任务调度器汇报状态的逻辑
-        self.connection.send_message(self.device['drone'], "scheduler", is_on_track)
-
+        """
+        向调度器汇报状态
+        
+        Args:
+            is_on_track: 是否按计划执行任务
+        """
+        # 构建状态报告消息
+        status_message = {
+            "msg_type": "task_progress",
+            "msg_content": is_on_track
+        }
+        
+        # 尝试获取p2p_node
+        p2p_node = None
+        if hasattr(self.executor, 'p2p_node') and self.executor.p2p_node:
+            p2p_node = self.executor.p2p_node
+            event_loop = self.executor.p2p_event_loop
+            
+            # 检查是否已连接到调度器
+            if "scheduler" in p2p_node.connections:
+                # 使用run_coroutine_threadsafe在事件循环中执行异步发送操作
+                try:
+                    future = asyncio.run_coroutine_threadsafe(
+                        p2p_node.send_message("scheduler", status_message),
+                        event_loop
+                    )
+                    # 等待操作完成，最多等待5秒
+                    success = future.result(timeout=5.0)
+                    if success:
+                        self.logger.info(f"已向调度器发送任务的状态报告")
+                    else:
+                        self.logger.error(f"向调度器发送状态报告失败")
+                except Exception as e:
+                    self.logger.error(f"发送状态报告时出错: {str(e)}")
+            else:
+                self.logger.warning("未连接到调度器，无法发送状态报告")
+        else:
+            self.logger.error("无法访问P2P节点，无法发送状态报告")
+            
 
     def stop(self):
         self.stop_event.set()
@@ -66,70 +164,72 @@ class DronePerceptor(threading.Thread):
     
     def check_task_progress(self, task, logs, monitor_data):
         # 提取感知结果
-        result = perception_func(task, logs, monitor_data)
+        result = func_task_perception(task, logs, monitor_data)
 
         # 提取分析结果,结果的格式应该是
         if result:
             analysis = result.output.choices[0].message.content
             return analysis
         return None
-
-    def func():
-        """
-        分布式的情况下，感知器需要读取messages，根据无人机之间的消息，更新任务（无人机）之间的依赖关系，还要传递必要的数据
-        """
-        pass
     
-    def analysis_messages(self):
+    def percept_message(self):
         """
-        分析无人机之间的消息，更新任务之间的依赖关系，并传递必要的数据
+        分析P2P网络中接收到的消息，更新任务依赖关系和数据
         """
-        """
-        无人机的日志应该是什么样的：
-        1.另一架无人机通知本无人机启动
-        发送者: iris_0, 接收者: iris_1, 消息: iris_0 -> iris_1: 
-        任务{subtask1}执行成功，在无人机{iris_1}开始执行任务{subtask2}，请准备
-        2.另一架无人机为本无人机提供数据
-        发送者: iris_0, 接收者: iris_1, 消息: iris_0 -> iris_1:
-        任务{subtask1}提供数据: {data}
-        数据的格式是：key-value,例如{"target_position": [x,y,z]} . 需要规定到所有的数据格式，假设已经规定好了
-        """
-        try:
-            with open(f"mywebsocket/messages/message_{self.device['drone']}.txt", "r", encoding="utf-8") as file:
-                messages = file.readlines()[-100:]  # 只读取最新的100行
-            # 处理读取的消息逻辑
-            for message in messages:
-                try:
-                    list = message.split(", ")
-                    sender, receiver, content = list[0], list[1], list[2:]
-                    sender = sender.split(": ")[1]
-                    receiver = receiver.split(": ")[1]
-                    content = ", ".join(content)
-                    if "执行成功" in content and "开始执行任务" in content:
-                        # 解析任务启动消息
-                        task_info = content.split("，")
-                        subtask1 = task_info[0].split("{")[1].split("}")[0]
-                        subtask2 = task_info[1].split("{")[1].split("}")[0]
-                        print(f"任务 {subtask1} 执行成功，任务 {subtask2} 的依赖部分满足。")
-                        # TODO: 改变执行器中finished_task
-                        # 将任务编号放入分布式任务完成列表
-                        subtask1_id = int(subtask1.replace("subtask", ""))
-                        self.dis_finished_list.append(subtask1_id)
+        # 处理消息队列中的所有消息
+        if not hasattr(self, "message_queue"):
+            self.logger.warning("消息队列不存在")
+            return
 
-                    elif "提供数据" in content:
-                        # 解析数据提供消息
-                        task_info, data_info = content.split("提供数据: ", 1)
-                        subtask = task_info.split("{")[1].split("}")[0]
-                        data = eval(data_info)
-                        print(f"任务 {subtask} 提供数据: {data}")
-                        # 更新任务数据
-                        self.dynamic_data.update(data)
-                except Exception as e:
-                    print(f"无人机感知器解析消息时发生错误: {e}")
+        for yaw_message in self.message_queue:
+            sender_id = yaw_message.get("sender_id")
+            timestamp = yaw_message.get("timestamp")
+            message = yaw_message.get("message")
+            msg_type = message.get("msg_type")
             
-            # 分析任务状态
-
-        except FileNotFoundError:
-            print(f"文件未找到: mywebsocket/messages/message_{self.device['drone']}.txt")
-        except Exception as e:
-            print(f"读取文件时发生错误: {e}")
+            if msg_type == "data":
+                # 关于传递的消息
+                content = message.get("msg_content")
+                try:
+                    # 将字符串解析为JSON对象
+                    data = json.loads(content)
+                    
+                    # 更新动态数据
+                    self.dynamic_data.update(data)
+                    self.logger.info(f"已更新动态数据: {list(data.keys())}")
+                except json.JSONDecodeError as e:
+                    self.logger.error(f"解析数据消息时发生错误: {str(e)}")
+            elif msg_type =="start_notice":
+                content = message.get("msg_content")
+                # 通知启动的格式是什么样的
+                try:
+                    # 将字符串解析为JSON对象
+                    notice = json.loads(content)
+                    
+                    # TODO: 解析通知内容,并更新任务依赖关系
+                    
+                    # 日志记录解析出的内容
+                    self.logger.info(f"任务启动通知 - 完成的任务XXXXXX")
+                except json.JSONDecodeError as e:
+                    self.logger.error(f"解析启动通知消息时发生错误: {str(e)}")
+            elif msg_type =="script":
+                # 处理脚本消息
+                self.message_queue.remove(yaw_message)  # 删除这一条脚本消息，避免重复执行
+                script_code = message.get("msg_content")
+                self.logger.info(f"接收到脚本消息: {script_code}")
+                # 将脚本代码传递给执行器执行
+                if self.executor:
+                    self.executor.execute_task(script_code)
+                else:
+                    self.logger.error("执行器未初始化，无法执行脚本")
+    
+    def update_dynamic_data(self, data):
+        """
+        更新动态数据
+        
+        Args:
+            data: 要更新的数据字典
+        """
+        if isinstance(data, dict):
+            self.dynamic_data.update(data)
+            self.logger.info(f"已更新动态数据: {list(data.keys())}")

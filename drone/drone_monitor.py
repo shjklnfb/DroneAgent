@@ -1,6 +1,7 @@
 import threading
 import time
 import os
+from utils.log_configurator import setup_drone_logger
 from datetime import datetime  # 确保 datetime 已导入
 import rospy
 from mavros_msgs.msg import State
@@ -34,6 +35,7 @@ class DroneMonitor(threading.Thread):
             'other': None
         }
         self.stop_event = threading.Event()
+        self.logger = setup_drone_logger(id, device["drone"])
 
     def run(self):
         while not self.stop_event.is_set():

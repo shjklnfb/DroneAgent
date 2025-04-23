@@ -3,6 +3,7 @@ import io
 from PIL import Image
 from models.yolo.yolov8 import detect_with_yolov8  # 导入 yolov8 检测方法
 from models.llm.qwen import *  # 导入 qwen 模型方法
+from entity.entity import SubTask
 '''
 这个文件是模型接口文件
 云端调用模型写在mdoels文件夹下的各个模型文件中
@@ -11,7 +12,7 @@ from models.llm.qwen import *  # 导入 qwen 模型方法
 '''
 
 # 检测目标是否存在
-def detect_target(picture: str, target: str) -> list:
+def func_detect_target(picture: str, target: str) -> list:
     """
     检测图片中是否包含指定目标。
 
@@ -36,7 +37,7 @@ def detect_target(picture: str, target: str) -> list:
         return None
 
 
-def task_decomposition(task_description):
+def func_task_decomposition(prompt):
     """
     任务分解方法，调用call_deepseek_r1进行任务分解
 
@@ -45,14 +46,44 @@ def task_decomposition(task_description):
     """
     try:
         # 调用call_deepseek_r1函数进行任务分解
-        decomposed_tasks = call_deepseek_r1(task_description)
+        # decomposed_tasks = call_deepseek_r1(prompt)
+
+        # 这里使用一个示例的分解任务列表，实际应用中需要根据模型返回的结果进行处理
+        decomposed_tasks = [SubTask(
+        id=1,
+        name='subtask1',
+        description='子任务1：无人机1起飞到有利侦查位置，寻找到目标',
+        depid=[],
+        drone="iris_0",
+        drone_ip="localhost",
+        drone_port=8900,
+        steps="无人机1起飞到有利侦查位置，寻找到目标",
+        requirements={
+        'interrupt_handling': True,
+        'status_check_interval': 3,
+        'position_accuracy': 0.5
+        },services=["服务1"]),SubTask(
+        id=2,
+        name='subtask2',
+        description='子任务2：无人机2起飞，飞行到无人机1返回的目标位置',
+        depid=[1],
+        drone="iris_1",
+        drone_ip="localhost",
+        drone_port=8901,
+        steps="无人机2起飞，飞行到无人机1返回的目标位置",
+        requirements={
+        'interrupt_handling': True,
+        'status_check_interval': 3,
+        'position_accuracy': 0.5
+        },services=["服务2"])]
+
         #TODO: 格式化输出
         return decomposed_tasks
     except Exception as e:
         print(f"Error during task decomposition: {e}")
         return []
 
-def generate_launch_file(drones,world_file):
+def func_generate_launch_file(drones,world_file):
     """
     生成launch文件
     :param drones: 无人机列表
@@ -63,14 +94,14 @@ def generate_launch_file(drones,world_file):
     # TODO: 格式化输出
     return "launch file content"
 
-def subtask_to_python(subtasks):
+def func_subtask_to_python(subtask):
     """
     将任务描述转换为Python代码
     """
     # TODO: 调用大模型生成Python代码
     pass
 
-def perception_func(task, logs, monitor_data):
+def func_task_perception(task, logs, monitor_data):
     """
     感知器调用，根据日志和监控数据检查任务执行情况
     :param logs: 日志数据
@@ -90,3 +121,9 @@ def perception_func(task, logs, monitor_data):
     except Exception as e:
         print(f"Error during perception: {e}")
         return None
+    
+def func_assign_drone(subtasks):
+    return subtasks
+
+def func_generate_steps(subtasks):
+    return subtasks

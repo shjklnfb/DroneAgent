@@ -1,33 +1,10 @@
+import yaml
+
 class ModelLibrary:
     def __init__(self):
-        # 初始化模型库，存储多云服务的配置信息
-        self.services = {
-            "yolov8": {
-                "ip": "47.93.46.144",
-                "port": 8000,
-                "description": "YOLO object detection service",
-                "apikey": "your-yolo-apikey"
-            },
-            "qwen-vl-plus": {
-                "domain": "large-model.example.com",
-                "port": 443,
-                "description": "Large language model service",
-                "apikey": "sk-d34cba22d2a04a5c8c191f082106d07e"
-            },
-            "qwen-plus": {
-                "domain": "qwen.example.com",
-                "port": 443,
-                "description": "Qwen large language model service",
-                "apikey": "sk-d34cba22d2a04a5c8c191f082106d07e"
-            },
-            "deepseek-r1": {
-                "domain": "deepseek.example.com",
-                "port": 443,
-                "description": "Deepseek task decomposition model service",
-                "apikey": "sk-d34cba22d2a04a5c8c191f082106d07e"
-            }
-            # 可以继续添加其他服务
-        }
+        # 从 resource/service.yaml 文件加载服务配置
+        with open("./resource/service.yaml", "r", encoding="utf-8") as file:
+            self.services = yaml.safe_load(file)
 
     def get_service_info(self, service_name):
         """

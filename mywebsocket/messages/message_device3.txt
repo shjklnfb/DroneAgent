@@ -1,1 +1,0 @@
-发送者: device2, 接收者: device3, 消息: device2 -> device3: Hello from device2 to device3

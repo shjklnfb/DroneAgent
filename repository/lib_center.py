@@ -1,7 +1,7 @@
 
 import json
 from models.llm.qwen import call_with_messages,generate_response_with_images  # 引入qwen模块
-from utils.log_configurator import setup_logger_exec
+from utils.log_configurator import setup_script_logger
 
 
 # 调度器的自定义库函数
@@ -100,14 +100,13 @@ def interrupt(drone):
 
 def log_info(id, information):
     """记录信息日志"""
-    logger = setup_logger_exec(id)
+    logger = setup_script_logger(id, "script_name")
     logger.info(information)
-    # print(information)
     
 
-def send_to_drone(connector, sender, receiver, message):
-    """发送消息到无人机"""
-    # 这里可以实现具体的发送逻辑
-    connector.send_message(sender,receiver,message)
-    print(f"Sending info to drone: {message}")
-    return True
+# def send_to_drone(connector, sender, receiver, type, message):
+#     """发送消息到无人机"""
+#     # 这里可以实现具体的发送逻辑
+#     connector.send_message(sender,receiver,type,message)
+#     print(f"Sending info to drone: {message}")
+#     return True

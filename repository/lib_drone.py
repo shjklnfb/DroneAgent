@@ -1,7 +1,5 @@
-import websocket
-import json
-import websockets
-from models.model_functions import detect_target
+import asyncio
+from models.model_functions import func_detect_target
 from repository.lib_center import get_drone_sensor_data
 from repository.instructions.command_takeoff import command_takeoff
 import threading
@@ -117,7 +115,7 @@ def search(drone, dronemonitor, target, radius, duration):
         image = get_drone_sensor_data(dronemonitor, 'depth_image')
         photo_file = take_photo(dronemonitor)
         
-        if detect_target(photo_file, target):
+        if func_detect_target(photo_file, target):
             # 计算坐标
             depth_file = save_depth_image(dronemonitor)
             # cal_pos()
@@ -143,7 +141,7 @@ def spiral(drone, dronemonitor, target, radius, velocity, duration):
         # 开始目标检测
         image = get_drone_sensor_data(dronemonitor, 'depth_image')
         depth_file,photo_file = save_depth_image(dronemonitor)
-        bbox = detect_target(photo_file, target)
+        bbox = func_detect_target(photo_file, target)
         print(bbox)
         if bbox is not None:
             # 计算坐标
@@ -244,9 +242,39 @@ def follow(drone, target):
     """让 {drone} 跟踪目标 {target}"""
     return True
 
-def send_message(connector, sender, receiver, message):
-    """发送消息到 {drone}"""
-    # 这里可以实现发送消息的逻辑
-    connector.send_message(sender,receiver,message)
-    return True
-
+# 辅助函数：在同步函数中发送P2P消息
+def send_p2p_message(p2p_node, target_id: str, message: dict) -> bool:
+    """
+    在同步函数中使用p2p_node发送消息
+    
+    Args:
+        p2p_node: P2P节点对象
+        target_id: 目标节点ID
+        message: 要发送的消息内容
+        
+    Returns:
+        bool: 发送是否成功
+    """
+    # 获取当前事件循环
+    if hasattr(p2p_node, 'p2p_event_loop') and p2p_node.p2p_event_loop:
+        loop = p2p_node.p2p_event_loop
+    else:
+        # 如果找不到p2p_node的事件循环，尝试使用当前线程的事件循环
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            print("无法获取事件循环，消息发送失败")
+            return False
+    
+    try:
+        # 在事件循环中执行异步发送操作
+        future = asyncio.run_coroutine_threadsafe(
+            p2p_node.send_message(target_id, message),
+            loop
+        )
+        # 等待操作完成，最多等待5秒
+        success = future.result(timeout=5.0)
+        return success
+    except Exception as e:
+        print(f"发送消息时出错: {str(e)}")
+        return False
