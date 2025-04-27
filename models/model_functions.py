@@ -114,7 +114,7 @@ def func_task_perception(task, logs, monitor_data):
         messages += "请分析当前子任务的执行情况，分析子任务是否完成，是否存在错误。注意只有当任务的最终目标得到满足时，才认为任务完成。"
         messages += "每个步骤执行都可以重复一定的次数，因此暂时的错误不算错误，只有出现“xxx失败超过n次,任务终止”时，才认为这个步骤失败，导致任务失败。运行中表示任务的步骤错误还没有超过最大次数，最后一个步骤也没有执行完成。"
         messages += "任意一个步骤出错超过限度时，任务就会失败。失败时给出失败的原因和在哪个步骤失败的。"
-        messages += "要求的输出的内容格式为：{\"task\":\"task.name\",\"state\":\"finish/error/running\",\"reason\":\"reason\"}。字数在200字以内，不要换行。注意这个task.name是subtask1,subtask2等子任务的名称,而不是步骤的名称或描述。"
+        messages += "要求的输出的内容格式为：{\"task\":\"task.name\",\"state\":\"finish/error/running\",\"reason\":\"这里描述具体的原因\"}。不要输出其他的，不按照这个格式的内容。字数在200字以内，不要换行。注意这个task.name是subtask1,subtask2等子任务的名称,而不是步骤的名称或描述。"
         
         result = call_with_messages(messages)
         return result

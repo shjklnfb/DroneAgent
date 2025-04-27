@@ -6,6 +6,7 @@ from multiprocessing import Manager
 import os
 import time
 
+
 class TaskInitializer:
     """
     任务初始化器

@@ -4,7 +4,7 @@
 yolov8:
   type:
   url:
-  ip: "47.93.46.144"
+  ip: "47.113.185.245"
   port: 8000
   description: "YOLO object detection service"
   apikey: 

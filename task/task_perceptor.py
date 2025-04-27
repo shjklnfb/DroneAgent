@@ -16,6 +16,7 @@ class TaskPerceptor:
         """
         self.id = id
         self.scheduler = scheduler  # 任务调度器实例
+        self.finish = False
         self.finish_tasks = []
         self.message_queue = [] # 用于存储接收到的消息     
         self.logger = setup_task_logger(self.id)
@@ -57,7 +58,7 @@ class TaskPerceptor:
         
         # 将消息写入日志文件
         with open(log_file, "a", encoding="utf-8") as log_f:
-            log_f.write({time.strftime('%Y-%m-%d %H:%M:%S')} - json.dumps(yaw_message, ensure_ascii=False) + "\n")
+            log_f.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} - {json.dumps(yaw_message, ensure_ascii=False)}\n")
 
     def percept_message(self):
         """
@@ -68,6 +69,7 @@ class TaskPerceptor:
             return
 
         for yaw_message in self.message_queue:
+            self.message_queue.remove(yaw_message)  # 从队列中删除已处理的消息
             sender_id = yaw_message.get("sender_id")
             timestamp = yaw_message.get("timestamp")
             message = yaw_message.get("message")
@@ -87,7 +89,7 @@ class TaskPerceptor:
                     # 日志记录解析出的内容
                     self.logger.info(f"任务进度更新 - 任务: {task}, 状态: {state}, 原因: {reason}")
                     
-                    if state == "error":
+                    if state == "error*********":  # FIXME: 无人机感知器传来的error不一定就是error
                         # 调用错误处理函数
                         self.handle_error(progress_content)
                     elif state == "finish":
@@ -104,6 +106,12 @@ class TaskPerceptor:
                         self.logger.warning(f"未知任务状态: {state}")
                 except json.JSONDecodeError as e:
                     self.logger.error(f"任务感知器解析任务进度内容时发生错误: {str(e)}")
+            
+            # 自定义的未知消息类型处理
+            elif msg_type == "unknown":
+                self.logger.warning(f"接收到自定义未知消息类型: {message}")
+                # TODO: 处理未知消息类型的逻辑
+
 
     def handle_error(self, progress_content):
         """
@@ -113,13 +121,15 @@ class TaskPerceptor:
             progress_content: 包含任务错误信息的字典
         """
         print("处理错误,应该需要重新规划任务")
+        self.scheduler.clear_task()    # 终止所有进程
+
 
     def run(self):
         """
         运行任务感知器，持续检查无人机感知器状态。
         """
         self.logger.info("任务感知器开始运行")
-        while True:
+        while not self.finish:
             try:
                 self.percept_message()
             except Exception as e:

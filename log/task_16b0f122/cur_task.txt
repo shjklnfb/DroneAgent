@@ -1,2 +1,27 @@
 {
-    "task": 
+    "dis_task_list": [
+        {
+            "id": 2,
+            "name": "subtask2",
+            "description": "子任务2：无人机2起飞，飞行到无人机1返回的目标位置",
+            "depid": [
+                1
+            ],
+            "steps": "无人机2起飞，飞行到无人机1返回的目标位置",
+            "requirements": {
+                "interrupt_handling": true,
+                "status_check_interval": 3,
+                "position_accuracy": 0.5
+            },
+            "device": {
+                "drone": "iris_1",
+                "drone_ip": "localhost",
+                "drone_port": 8901
+            },
+            "services": [
+                "服务2"
+            ],
+            "dependent_by_subtask_ids": []
+        }
+    ]
+}

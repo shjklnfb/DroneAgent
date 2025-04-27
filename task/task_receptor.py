@@ -72,5 +72,6 @@ class TaskReceptor:
             self.log_task_info(self.raw_input, self.input)
             self.logger.info(f"保存任务: {self.input}")
             self.logger.info("任务接受器运行完成")
+            self.process_user_input(self.input)  # 处理用户输入
             print(f"输入完成，保存任务: {self.input}")
             print("系统将继续运行，执行任务......")

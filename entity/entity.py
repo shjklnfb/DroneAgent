@@ -38,5 +38,19 @@ class SubTask:
             f"dependent_by_subtask_ids={self.dependent_by_subtask_ids})"
         )
 
-
+    def to_dict(self):
+        """
+        将子任务对象转换为字典表示。
+        """
+        return {
+            "id": self.id,
+            "name": self.name,
+            "description": self.description,
+            "depid": self.depid,
+            "steps": self.steps,
+            "requirements": self.requirements,
+            "device": self.device,
+            "services": self.services,
+            "dependent_by_subtask_ids": self.dependent_by_subtask_ids
+        }
 

@@ -11,7 +11,7 @@ def detect_with_yolov8(image_path: str) -> bytes:
     :param image_path: 本地图片路径
     :return: 带标注框的图片的二进制数据和标注信息
     """
-    url = "http://47.93.46.144:8000/detect"
+    url = "http://47.113.185.245:8000/detect"
     with open(image_path, 'rb') as file:
         files = {'file': file}
         response = requests.post(url, files=files)

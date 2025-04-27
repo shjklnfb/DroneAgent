@@ -7,6 +7,24 @@ import json
 import os
 import asyncio
 
+# 添加中断标志包装类
+class InterruptFlag:
+    """中断标志的包装类，使得脚本可以动态感知标志变化"""
+    def __init__(self, value=False):
+        self.value = value
+    
+    def __bool__(self):
+        """允许将对象直接用于布尔表达式"""
+        return self.value
+    
+    def set(self):
+        """设置中断标志为True"""
+        self.value = True
+    
+    def clear(self):
+        """清除中断标志为False"""
+        self.value = False
+
 '''
 无人机感知器
 独立运行的线程， 读取任务控制器下发的子任务，并读取子任务执行器执行过程中的日志，读取无人机感知器的输出，
@@ -25,6 +43,7 @@ class DronePerceptor(threading.Thread):
         self.stop_event = threading.Event()
         self.message_queue = []  # 用于存储接收到的消息
         self.dis_finished_list = []  # 分布式执行中完成的任务ID列表
+        self.interrupt_flag = InterruptFlag(False)  # 使用包装类替代布尔值
         
         self.logger = setup_drone_logger(id, device["drone"])
 
@@ -103,8 +122,11 @@ class DronePerceptor(threading.Thread):
             time.sleep(5)
 
     def read_flight_logs(self):
+        if self.task is None:
+            print("Error: Task is not initialized.")
+            return None
         # 读取脚本执行日志文件
-        log_file_path = f"log/{self.id}/executor.log"
+        log_file_path = f"log/{self.id}/script_{self.task.name}.log"
         try:
             with open(log_file_path, 'r', encoding='utf-8') as log_file:
                 logs = log_file.readlines()
@@ -188,6 +210,7 @@ class DronePerceptor(threading.Thread):
             msg_type = message.get("msg_type")
             
             if msg_type == "data":
+                self.message_queue.remove(yaw_message)  # 删除这一条脚本消息，避免重复执行
                 # 关于传递的消息
                 content = message.get("msg_content")
                 try:
@@ -200,13 +223,19 @@ class DronePerceptor(threading.Thread):
                 except json.JSONDecodeError as e:
                     self.logger.error(f"解析数据消息时发生错误: {str(e)}")
             elif msg_type =="start_notice":
+                self.message_queue.remove(yaw_message)  # 删除这一条脚本消息，避免重复执行
                 content = message.get("msg_content")
                 # 通知启动的格式是什么样的
                 try:
                     # 将字符串解析为JSON对象
                     notice = json.loads(content)
                     
-                    # TODO: 解析通知内容,并更新任务依赖关系
+                    completed_task = notice.get("completed_task")
+                    next_task = notice.get("next_task")
+                    # 提取完成任务的编号，例如从 "subtask1" 中提取出数字 1
+                    task_number = int(completed_task[len("subtask"):])
+                    
+                    self.dis_finished_list.append(task_number)  # 更新完成的任务列表
                     
                     # 日志记录解析出的内容
                     self.logger.info(f"任务启动通知 - 完成的任务XXXXXX")
@@ -217,11 +246,47 @@ class DronePerceptor(threading.Thread):
                 self.message_queue.remove(yaw_message)  # 删除这一条脚本消息，避免重复执行
                 script_code = message.get("msg_content")
                 self.logger.info(f"接收到脚本消息: {script_code}")
-                # 将脚本代码传递给执行器执行
+                # 将脚本代码写入执行器的waiting_script属性，而不是直接执行
                 if self.executor:
-                    self.executor.execute_task(script_code)
+                    self.executor.waiting_script = script_code
+                    self.logger.info("已将脚本写入执行器的waiting_script属性，等待执行")
                 else:
                     self.logger.error("执行器未初始化，无法执行脚本")
+            elif msg_type == "interrupt":
+                # 处理中断消息
+                self.message_queue.remove(yaw_message)  # 删除这一条中断消息，避免重复处理
+                
+                try:
+                    # 解析中断消息内容
+                    content = message.get("msg_content", {})
+                    
+                    # 提取中断任务的关键属性
+                    priority = content.get("priority", 1)  # 默认优先级为1，高于普通任务
+                    restore = content.get("restore", True)  # 默认在完成后恢复原任务
+                    subtask = content.get("subtask")  # 子任务对象
+                    code = content.get("code", "")  # 要执行的脚本代码
+                    
+                    self.logger.info(f"收到中断任务请求，优先级: {priority}, 完成后恢复: {restore}")
+                    
+                    # 将中断任务传递给执行器处理
+                    if self.executor:
+                        success = self.executor.handle_interrupt(priority, restore, subtask, code)
+                        if success:
+                            self.logger.info("中断任务已传递给执行器处理")
+                        else:
+                            self.logger.warning("执行器拒绝了中断请求")
+                    else:
+                        self.logger.error("执行器未初始化，无法处理中断任务")
+                    
+                except Exception as e:
+                    self.logger.error(f"处理中断消息时发生错误: {str(e)}")
+                    self.interrupt_flag.clear()  # 确保中断标志被重置
+            elif msg_type == "unknown":
+                # TODO: 处理未知消息类型
+                self.logger.warning(f"未知消息类型: {yaw_message}")
+            else:
+                self.logger.error(f"无法处理消息: {yaw_message}")
+
     
     def update_dynamic_data(self, data):
         """

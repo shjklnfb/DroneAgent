@@ -255,16 +255,34 @@ def send_p2p_message(p2p_node, target_id: str, message: dict) -> bool:
     Returns:
         bool: 发送是否成功
     """
-    # 获取当前事件循环
-    if hasattr(p2p_node, 'p2p_event_loop') and p2p_node.p2p_event_loop:
+    # 获取事件循环 - 按优先级尝试不同方式获取
+    loop = None
+    
+    # 1. 首先尝试从p2p_node对象获取event_loop属性
+    if hasattr(p2p_node, 'event_loop') and p2p_node.event_loop:
+        loop = p2p_node.event_loop
+        print("使用p2p_node.event_loop")
+    
+    # 2. 其次尝试获取p2p_node对象的p2p_event_loop属性
+    elif hasattr(p2p_node, 'p2p_event_loop') and p2p_node.p2p_event_loop:
         loop = p2p_node.p2p_event_loop
-    else:
-        # 如果找不到p2p_node的事件循环，尝试使用当前线程的事件循环
+        print("使用p2p_node.p2p_event_loop")
+        
+    # 3. 再尝试获取当前线程的事件循环
+    if loop is None:
         try:
             loop = asyncio.get_event_loop()
+            print("使用当前线程事件循环")
         except RuntimeError:
-            print("无法获取事件循环，消息发送失败")
-            return False
+            # 4. 如果以上都失败，尝试创建新的事件循环
+            try:
+                loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(loop)
+                print("创建并使用新事件循环")
+            except Exception as e:
+                print(f"无法创建新事件循环: {str(e)}")
+                print("无法获取事件循环，消息发送失败")
+                return False
     
     try:
         # 在事件循环中执行异步发送操作

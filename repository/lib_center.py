@@ -1,4 +1,3 @@
-
 import json
 from models.llm.qwen import call_with_messages,generate_response_with_images  # 引入qwen模块
 from utils.log_configurator import setup_script_logger
@@ -86,21 +85,26 @@ def check_with_picture(drone, info, target, picture=None):
         print("未能成功获取响应")
         return False, "请求失败或无响应"
 
-# def start(task):
-#     """开始执行任务"""
-#     return True
+def interrupt(interrupt_flag):
+    """
+    检查是否收到中断信号
+    
+    Args:
+        interrupt_flag: 可以是InterruptFlag对象或布尔值
+        
+    Returns:
+        bool: 如果有中断信号则返回True，否则返回False
+    """
+    if hasattr(interrupt_flag, 'value'):
+        # 处理InterruptFlag对象
+        return interrupt_flag.value
+    else:
+        # 处理普通布尔值或其他类型
+        return bool(interrupt_flag)
 
-# def finish(task):
-#     """完成任务"""
-#     return True
-
-def interrupt(drone):
-    """中断无人机的操作"""
-    return False
-
-def log_info(id, information):
+def log_info(id, information, func_name):
     """记录信息日志"""
-    logger = setup_script_logger(id, "script_name")
+    logger = setup_script_logger(id, func_name)
     logger.info(information)
     
 
