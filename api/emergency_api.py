@@ -84,6 +84,25 @@ class EmergencyAPI:
 #     "drone_id": "iris_0",
 #     "priority": 3,
 #     "restore": true,
-#     "code": "def emergency_task(id, drone, monitor, p2p_node, dynamic_data, interrupt_flag):\n    print(\"执行紧急返回任务\")\n    import time\n    for i in range(5):\n        print(f\"返回中... {i+1}/5\")\n        time.sleep(1)\n    return \"紧急返回完成\""
+#     "code": "def emergency_task(id, drone, monitor, p2p_node, dynamic_data):\n    print(\"执行紧急返回任务\")\n    import time\n    for i in range(5):\n        print(f\"返回中... {i+1}/5\")\n        time.sleep(1)\n    return \"紧急返回完成\""
 #   }'
+
+# curl -X POST http://localhost:5000/emergency \
+#   -H "Content-Type: application/json" \
+#   -d '{
+#     "drone_id": "iris_0",
+#     "priority": 5,
+#     "restore": true,
+#     "code": "from repository.lib_drone import *\nfrom repository.lib_center import *\nimport inspect\nimport time\n\ndef emergency_task(id, drone, dronemonitor, p2p_node, dynamic_data):\n    func_name = inspect.currentframe().f_code.co_name\n    fly_to(drone, -5,-8,7)\n    time.sleep(10)"
+#   }'
+
+# from repository.lib_drone import *
+# from repository.lib_center import *
+# import inspect
+# import time
+
+# def emergency_task(id, drone, dronemonitor, p2p_node, dynamic_data):
+#     func_name = inspect.currentframe().f_code.co_name
+#     fly_to(drone, -5,-8,7)
+#     time.sleep(10) 
 

@@ -85,22 +85,6 @@ def check_with_picture(drone, info, target, picture=None):
         print("未能成功获取响应")
         return False, "请求失败或无响应"
 
-def interrupt(interrupt_flag):
-    """
-    检查是否收到中断信号
-    
-    Args:
-        interrupt_flag: 可以是InterruptFlag对象或布尔值
-        
-    Returns:
-        bool: 如果有中断信号则返回True，否则返回False
-    """
-    if hasattr(interrupt_flag, 'value'):
-        # 处理InterruptFlag对象
-        return interrupt_flag.value
-    else:
-        # 处理普通布尔值或其他类型
-        return bool(interrupt_flag)
 
 def log_info(id, information, func_name):
     """记录信息日志"""

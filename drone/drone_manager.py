@@ -4,7 +4,8 @@ import asyncio
 from communication.p2p_node import P2PNode
 import time
 import traceback
-
+from repository.lib_drone import takeoff as drone_control_thread_start
+ 
 class DroneManager:
     def __init__(self, device, task, drone_executor, drone_perceptor, drone_monitor):
         self.device = device
@@ -78,6 +79,8 @@ class DroneManager:
         # 初始化 ROS 节点
         import rospy
         rospy.init_node("drone_manager", anonymous=True, disable_signals=True)
+
+        drone_control_thread_start(self.device['drone'])
 
         # 先启动P2P网络线程
         self.p2p_thread = threading.Thread(target=self.start_p2p_network, daemon=True)

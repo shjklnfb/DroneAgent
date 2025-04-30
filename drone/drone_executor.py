@@ -3,8 +3,11 @@ import json
 import traceback
 import time
 import asyncio
+import ctypes
+import inspect
+import signal
 from queue import Queue, PriorityQueue
-from communication.p2p_node import P2PNode  # 添加导入
+from communication.p2p_node import P2PNode
 from utils.log_configurator import setup_drone_logger
 import os
 import json
@@ -14,6 +17,119 @@ import json
 独立运行的线程，负责接收并读取任务调度器下发给自己的子任务（包括：python代码和子任务描述）
 只需要执行python脚本即可
 '''
+
+class ScriptThread(threading.Thread):
+    """可以被强制终止的脚本执行线程，改进版"""
+    
+    def __init__(self, target, args=(), kwargs={}):
+        super(ScriptThread, self).__init__()
+        self.target = target
+        self.args = args
+        self.kwargs = kwargs
+        self.daemon = True  # 设为守护线程
+        self.result = None
+        self.exception = None
+        self._stop_requested = False
+        self._thread_id = None
+        
+    def run(self):
+        """执行目标函数并捕获结果或异常"""
+        # 存储当前线程ID
+        self._thread_id = threading.get_ident()
+        try:
+            self.result = self.target(*self.args, **self.kwargs)
+        except SystemExit:
+            # 捕获 SystemExit 异常，这是我们用来终止线程的信号
+            # 可以进行一些后处理
+            print(f"通过 SystemExit 成功终止线程")
+            self._stop_requested = True
+        except Exception as e:
+            self.exception = e
+            traceback.print_exc()
+    
+    def _async_raise(self, thread_id, exception_class):
+        """向线程注入异常"""
+        # 确保线程ID有效
+        if thread_id not in threading._active:
+            return False
+            
+        # 获取线程对象
+        thread = threading._active.get(thread_id)
+        if not thread:
+            return False
+            
+        # 注入异常到线程
+        ret = ctypes.pythonapi.PyThreadState_SetAsyncExc(
+            ctypes.c_long(thread_id),
+            ctypes.py_object(exception_class)
+        )
+        
+        # 检查结果
+        if ret == 0:
+            return False  # 线程ID无效
+        elif ret > 1:
+            # 如果返回值大于1，可能有问题，尝试恢复
+            ctypes.pythonapi.PyThreadState_SetAsyncExc(
+                ctypes.c_long(thread_id),
+                ctypes.py_object(None)
+            )
+            return False
+        return True  # 成功注入异常
+    
+    def get_id(self):
+        """获取线程ID"""
+        if self._thread_id:
+            return self._thread_id
+            
+        for thread_id, thread in threading._active.items():
+            if thread is self:
+                self._thread_id = thread_id
+                return thread_id
+        return None
+    
+    def terminate(self, timeout=2.0):
+        """
+        强制终止线程，使用多种策略确保终止成功
+        
+        Args:
+            timeout: 等待线程终止的超时时间(秒)
+            
+        Returns:
+            bool: 终止是否成功
+        """
+        if not self.is_alive():
+            return True
+            
+        # 标记终止请求
+        self._stop_requested = True
+        
+        # 下面是三种方式：
+        # 注入SystemExit异常
+        thread_id = self.get_id()
+        if thread_id and self._async_raise(thread_id, SystemExit):
+            # 给线程一点时间来退出
+            start_time = time.time()
+            while self.is_alive() and time.time() - start_time < timeout:
+                time.sleep(0.1)
+                
+            if not self.is_alive():
+                return True
+        
+        # 尝试使用KeyboardInterrupt
+        # if thread_id:
+        #     self._async_raise(thread_id, KeyboardInterrupt)
+        #     # 再次等待一点时间
+        #     time.sleep(0.5)
+        #     if not self.is_alive():
+        #         return True
+        
+        # 尝试使用BaseException (几乎无法捕获的异常)
+        # if thread_id:
+        #     self._async_raise(thread_id, BaseException)
+        #     time.sleep(0.5)
+        #     return not self.is_alive()
+            
+        return False
 
 class DroneExecutor(threading.Thread):
 
@@ -31,7 +147,7 @@ class DroneExecutor(threading.Thread):
         self.message_queue = Queue()  # 用于存储接收到的消息
         self.cur_script = None  # 当前执行的脚本
         self.waiting_script = None  # 用于存储待执行的脚本
-
+        self.script_thread = None  # 用于存储执行脚本的线程
         self.p2p_node = None  # P2P通信节点
         self.p2p_event_loop = None  # P2P节点的事件循环
 
@@ -43,7 +159,7 @@ class DroneExecutor(threading.Thread):
         self.pending_interrupts = PriorityQueue()
 
         self.logger = setup_drone_logger(id, device["drone"])
-
+        
     def record_task(self):
         """
         记录当前任务和分布式任务列表到文件。
@@ -72,75 +188,105 @@ class DroneExecutor(threading.Thread):
             self.logger.error(f"记录任务数据时出错: {str(e)}")
             traceback.print_exc()
 
+    def _execute_script(self, code, namespace):
+        """在线程内执行脚本代码的方法"""
+        try:
+            # 执行脚本代码
+            exec(code, namespace)
+            
+            # 查找并执行任务函数
+            if self.task and self.task.name in namespace:
+                result = namespace[self.task.name](
+                    self.id, self.device["drone"], self.monitor, self.p2p_node, 
+                    self.perceptor.dynamic_data
+                )
+                self.logger.info(f"任务 {self.task.name} 执行结果: {result}")
+                # 将任务标记为完成(只有分布式有用)
+                if hasattr(self.perceptor, "dis_finished_list") and self.task:
+                    self.perceptor.dis_finished_list.append(self.task.id)
+                return result
+            elif "emergency_task" in namespace:
+                result = namespace["emergency_task"](
+                    self.id, self.device["drone"], self.monitor, self.p2p_node, 
+                    self.perceptor.dynamic_data
+                )
+                self.logger.info(f"紧急任务执行结果: {result}")
+                return result
+            else:
+                self.logger.warning("未找到可执行函数")
+                return None
+        except Exception as e:
+            self.logger.error(f"执行脚本时出错: {str(e)}")
+            traceback.print_exc()
+            return None
+
     def execute_task(self, message):
         """
         执行接收到的任务代码。
         """
-        try:
-            # 解析消息内容
-            code = message
-            self.cur_script = code  # 保存当前脚本
-            if not code:
-                print("接收到的消息中没有任务代码")
-                return
+        
+        # # 终止正在运行的线程
+        # if self.script_thread and self.script_thread.is_alive():
+        #     self.logger.info("终止当前正在执行的脚本线程")
+        #     success = self.script_thread.terminate(timeout=3.0)  # 增加超时时间
+        #     self.logger.info(f"线程终止{'成功' if success else '失败'}")
+        #     if not success:
+        #         self.logger.warning("线程终止失败，强制继续执行新任务")
+        #     time.sleep(1.0)  # 给线程更多时间完成终止
+        
+        # 解析消息内容
+        code = message
+        self.cur_script = code  # 保存当前脚本
+        if not code:
+            self.logger.warning("接收到的消息中没有任务代码")
+            return
 
-            # 在执行之前，确保p2p_node对象能够访问到事件循环
-            if self.p2p_node and not hasattr(self.p2p_node, 'event_loop'):
-                self.p2p_node.event_loop = self.p2p_event_loop
+        # 在执行之前，确保p2p_node对象能够访问到事件循环
+        if self.p2p_node and not hasattr(self.p2p_node, 'event_loop'):
+            self.p2p_node.event_loop = self.p2p_event_loop
 
-            # 标记当前有任务正在执行
-            self.executing = True
+        # 标记当前有任务正在执行
+        self.executing = True
 
-            global_namespace = {
-                'id': self.id,
-                'drone': self.device["drone"],
-                'dronemonitor': self.monitor,
-                'p2p_node': self.p2p_node,  
-                'dynamic_data': self.perceptor.dynamic_data,
-                'interrupt_flag': self.perceptor.interrupt_flag,  # 传递包装类对象
-                '__builtins__': __builtins__,
-            }
-            exec(code, global_namespace)
-            if self.task and self.task.name in global_namespace:
-                result = global_namespace[self.task.name](
-                    self.id, self.device["drone"], self.monitor, self.p2p_node, self.perceptor.dynamic_data,
-                    self.perceptor.interrupt_flag  # 传递包装类对象
-                )
-                print(f"函数执行结果: {result}")
-            elif "emergency_task" in global_namespace:
-                result = global_namespace["emergency_task"](
-                    self.id, self.device["drone"], self.monitor, self.p2p_node, self.perceptor.dynamic_data,
-                    self.perceptor.interrupt_flag  # 传递包装类对象
-                )
-                print(f"紧急任务执行结果: {result}")
-            else:
-                print("集中式执行器未找到函数")
+        # 准备全局命名空间
+        global_namespace = {
+            'id': self.id,
+            'drone': self.device["drone"],
+            'dronemonitor': self.monitor,
+            'p2p_node': self.p2p_node,  
+            'dynamic_data': self.perceptor.dynamic_data,
+            '__builtins__': __builtins__,
+        }
+        
+        # 创建并启动执行线程
+        self.script_thread = ScriptThread(
+            target=self._execute_script,
+            args=(code, global_namespace)
+        )
+        self.script_thread.start()
+        self.logger.info(f"已启动脚本执行线程")
+        
+        # 等待线程完成
+        self.script_thread.join() # FIXME: *************************************************
+        
+        # 检查执行结果
+        if self.script_thread.exception:
+            self.logger.error(f"脚本执行异常: {self.script_thread.exception}")
+        elif self.script_thread.result is not None:
+            self.logger.info(f"脚本执行结果: {self.script_thread.result}")
+        
+        # 执行完毕，标记为未执行状态
+        self.executing = False
+        
+        # 任务完成后，先检查是否有待执行的中断任务
+        if not self.pending_interrupts.empty():
+            self.logger.info("检测到待执行的中断任务，优先处理")
+            self.process_pending_interrupt()
+            return
             
-            # 执行完毕，标记为未执行状态
-            self.executing = False
+        # 如果没有待执行的中断任务，再检查是否需要恢复被中断的任务
+        self.restore_interrupted_task()
             
-            # 任务完成后，先检查是否有待执行的中断任务
-            if not self.pending_interrupts.empty():
-                self.logger.info("检测到待执行的中断任务，优先处理")
-                self.process_pending_interrupt()
-                return
-                
-            # 如果没有待执行的中断任务，再检查是否需要恢复被中断的任务
-            self.restore_interrupted_task()
-        except Exception as e:
-            print(f"Error executing received code: {str(e)}")
-            traceback.print_exc()
-            # 发生错误，也尝试恢复任务
-            self.executing = False
-            
-            # 先检查是否有待执行的中断任务
-            if not self.pending_interrupts.empty():
-                self.logger.info("检测到待执行的中断任务，优先处理")
-                self.process_pending_interrupt()
-                return
-                
-            # 再检查是否需要恢复被中断的任务
-            self.restore_interrupted_task()
 
     def handle_interrupt(self, priority, restore, subtask, code):
         """
@@ -182,11 +328,20 @@ class DroneExecutor(threading.Thread):
             # 设置新任务的优先级
             self.current_priority = priority
             
-            # 设置中断标志，终止当前执行的任务
-            self.perceptor.interrupt_flag.set()  # 使用set()方法设置中断标志
-            time.sleep(1)  # 给当前任务一点时间来响应中断标志
-            self.perceptor.interrupt_flag.clear()  # 使用clear()方法清除中断标志
-            
+            # 强制终止当前执行的线程，尝试多次确保成功终止
+            if self.script_thread and self.script_thread.is_alive():
+                self.logger.info("强制终止当前执行的脚本线程")
+                for attempt in range(3):  # 尝试最多3次终止
+                    success = self.script_thread.terminate(timeout=1.0)
+                    if success:
+                        self.logger.info(f"线程终止成功 (尝试 {attempt+1})")
+                        break
+                    self.logger.warning(f"线程终止尝试 {attempt+1} 失败，再次尝试...")
+                    time.sleep(0.5)
+                
+                # 即使终止失败，仍然继续执行新任务
+                time.sleep(1.0)  # 给线程一点时间完成终止
+                
             # 更新子任务对象并执行新任务
             self.task = subtask
             self.cur_script = code
@@ -236,12 +391,7 @@ class DroneExecutor(threading.Thread):
     def restore_interrupted_task(self):
         """
         尝试恢复被中断的任务
-        """
-        # 如果队列中还有待执行的中断任务，先处理它们
-        if not self.pending_interrupts.empty():
-            self.process_pending_interrupt()
-            return True
-            
+        """        
         # 如果任务栈为空，没有需要恢复的任务
         if not self.task_stack:
             self.logger.info("任务栈为空，没有需要恢复的任务")
@@ -262,7 +412,7 @@ class DroneExecutor(threading.Thread):
         self.execute_task(self.cur_script)
         return True
 
-    def run_cen(self):
+    def run(self):
         """
         集中式模式下的线程运行方法
         """
@@ -317,7 +467,7 @@ class DroneExecutor(threading.Thread):
         """
         self.logger.info(f"P2P节点关闭请求由DroneManager处理")
     
-    def run(self):
+    def run_dis(self):
         """
         启动分布式执行器
         需要同时接受子任务描述和每个子任务的python代码
@@ -350,31 +500,7 @@ class DroneExecutor(threading.Thread):
                         # 从列表中移除当前任务和脚本
                         self.dis_task_list.remove(task)
                         self.dis_script_list.remove(script)
-                        try:
-                            self.logger.info(f"开始执行任务 {task_id}")
-                            # 执行脚本
-                            global_namespace = {
-                                'id': self.id,
-                                'drone': self.device["drone"],
-                                'dronemonitor': self.monitor,
-                                'p2p_node': self.p2p_node,
-                                'dynamic_data': self.perceptor.dynamic_data,
-                                'interrupt_flag': self.perceptor.interrupt_flag,  # 传递包装类对象
-                                '__builtins__': __builtins__
-                            }
-                            exec(script.get("script", ""), global_namespace)
-                            if task.name in global_namespace:
-                                result = global_namespace[task.name](
-                                    self.id, self.device["drone"], self.monitor, self.p2p_node, 
-                                    self.perceptor.dynamic_data, self.perceptor.interrupt_flag  # 传递包装类对象
-                                )
-                                self.logger.info(f"任务 {task_id} 执行结果: {result}")
-                                self.perceptor.dis_finished_list.append(task_id)
-                            else:
-                                self.logger.error(f"找不到任务函数 {task.name}")
-                        except Exception as e:
-                            self.logger.error(f"执行任务 {task_id} 时出错: {str(e)}")
-                            traceback.print_exc()
+                        self.execute_task(self.cur_script)
             # 防止过高的CPU占用率
             time.sleep(2)
 
@@ -386,6 +512,17 @@ class DroneExecutor(threading.Thread):
         
         # 设置停止事件，通知所有线程停止
         self.stop_event.set()
+        
+        # 强制终止当前执行的线程
+        if self.script_thread and self.script_thread.is_alive():
+            self.logger.info("终止当前执行的脚本线程")
+            for attempt in range(3):  # 尝试最多3次终止
+                success = self.script_thread.terminate(timeout=1.0)
+                if success:
+                    self.logger.info(f"线程终止成功 (尝试 {attempt+1})")
+                    break
+                self.logger.warning(f"线程终止尝试 {attempt+1} 失败，再次尝试...")
+                time.sleep(0.5)
 
         # 清空消息队列
         while not self.message_queue.empty():

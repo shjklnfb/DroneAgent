@@ -7,24 +7,6 @@ import json
 import os
 import asyncio
 
-# 添加中断标志包装类
-class InterruptFlag:
-    """中断标志的包装类，使得脚本可以动态感知标志变化"""
-    def __init__(self, value=False):
-        self.value = value
-    
-    def __bool__(self):
-        """允许将对象直接用于布尔表达式"""
-        return self.value
-    
-    def set(self):
-        """设置中断标志为True"""
-        self.value = True
-    
-    def clear(self):
-        """清除中断标志为False"""
-        self.value = False
-
 '''
 无人机感知器
 独立运行的线程， 读取任务控制器下发的子任务，并读取子任务执行器执行过程中的日志，读取无人机感知器的输出，
@@ -43,7 +25,6 @@ class DronePerceptor(threading.Thread):
         self.stop_event = threading.Event()
         self.message_queue = []  # 用于存储接收到的消息
         self.dis_finished_list = []  # 分布式执行中完成的任务ID列表
-        self.interrupt_flag = InterruptFlag(False)  # 使用包装类替代布尔值
         
         self.logger = setup_drone_logger(id, device["drone"])
 

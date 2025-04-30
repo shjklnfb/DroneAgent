@@ -1,0 +1,53 @@
+# # 忽略测试文件夹
+# test/
+# tests/
+# test_*/
+
+# # 忽略日志文件夹
+# log/
+# logs/
+
+# # 忽略图像文件夹
+# images/
+# imgs/
+
+# # 忽略所有 Python 缓存文件夹
+# __pycache__/
+# */__pycache__/
+# **/__pycache__/
+
+# # 忽略 Python 编译文件
+# *.py[cod]
+# *$py.class
+
+# # 忽略分发和打包
+# *.so
+# .Python
+# build/
+# develop-eggs/
+# dist/
+# downloads/
+# eggs/
+# .eggs/
+# lib/
+# lib64/
+# parts/
+# sdist/
+# var/
+# wheels/
+# *.egg-info/
+# .installed.cfg
+# *.egg
+# MANIFEST
+
+# # 忽略虚拟环境
+# venv/
+# env/
+# ENV/
+
+# # 忽略 IDE 文件
+# .idea/
+# .vscode/
+# *.swp
+# *.swo
+# .DS_Store
